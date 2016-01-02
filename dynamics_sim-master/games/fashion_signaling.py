@@ -2,9 +2,9 @@ from games.game import Game
 from games.payoff_matrices.fashion_signaling_matrices import senderPayoffs, receiverPayoffs
 
 class FashionSignaling(Game):
-    DEFAULT_PARAMS = dict(lNormalCost=1, lHiddenCost=3, hNormalCost=1, hHiddenCost=3, llSender=2, lhSender=2, \
-                          hlSender=1, hhSender=10, llReceiver=-5, hlReceiver=3, lhReceiver=-10, hhReceiver=10, \
-                          lReceiverCost=10, hReceiverCost=1, lSenderProp=4, hSenderProp=1, lReceiverProp=3, \
+    DEFAULT_PARAMS = dict(lNormalCost=1.1, lHiddenCost=1.1, hNormalCost=1.1, hHiddenCost=1.1, llSender=0.8, lhSender=5, \
+                          hlSender=1.2, hhSender=15, llReceiver=-10, hlReceiver=5, lhReceiver=-10, hhReceiver=10, \
+                          lReceiverCost=3, hReceiverCost=1, lSenderProp=8, hSenderProp=2, lReceiverProp=8, \
                           hReceiverProp=2, equilibrium_tolerance=0.2)
     PLAYER_LABELS = ('Low Sender', 'High Sender', 'Low Receiver', 'High Receiver')
     STRATEGY_LABELS = (('Silent', 'Normal', 'Hidden'),

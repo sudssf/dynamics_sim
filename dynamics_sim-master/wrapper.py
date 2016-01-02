@@ -57,10 +57,10 @@ class GameDynamicsWrapper(object):
         """
         self.dynamics_kwargs.update(*args, **kwargs)
         
-    def calculate_stationary(self):
+    def stationaryDistribution(self):
         pass
 
-    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=dict(on=1), return_labeled=True):
+    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=dict(on=1), burn=0, return_labeled=True):
         """
         Simulate the game for the given number of generations with the specified dynamics class and optionally graph the results
 
@@ -79,10 +79,16 @@ class GameDynamicsWrapper(object):
                                 player_frequencies=game.player_frequencies,
                                 **self.dynamics_kwargs)
         results = dyn.simulate(num_gens=num_gens)
-        #results_obj = SingleSimulationOutcome(self.dynamics_cls, self.dynamics_kwargs, self.game_cls, self.game_kwargs, results)
+        # results_obj = SingleSimulationOutcome(self.dynamics_cls, self.dynamics_kwargs, self.game_cls, self.game_kwargs, results)
         # TODO: serialize results to file
         params = Obj(**self.game_kwargs)
         frequencies = numpy.zeros(self.game_cls.num_equilibria())  # one extra for the Unclassified key
+
+        if burn:
+            print(burn)
+            for index, array in enumerate(results):
+                results[index] = array[burn:]
+
         if dyn.stochastic:
             classifications = []
             for state in zip(*results):
@@ -91,6 +97,7 @@ class GameDynamicsWrapper(object):
                 # note, if equi returns -1, then the -1 index gets the last entry in the array
                 classifications.append(equi)
                 frequencies[equi] += 1
+
         else:
             last_generation_state = results[-1]
             classification = game.classify(params, last_generation_state, game.equilibrium_tolerance)
@@ -106,7 +113,7 @@ class GameDynamicsWrapper(object):
 
             graph_options[GraphOptions.NO_MARKERS_KEY] = True
 
-            plot_data_for_players(results, range(num_gens), "Generation #", dyn.pm.num_strats,
+            plot_data_for_players(results, range(burn, num_gens), "Generation #", dyn.pm.num_strats,
                                   num_players=dyn.num_players,
                                   graph_options=graph_options)
         else:
@@ -115,7 +122,7 @@ class GameDynamicsWrapper(object):
             else:
                 return frequencies
 
-    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, return_labeled=True, parallelize=True):
+    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, return_labeled=True, burn=0, parallelize=True):
         """
         A helper method to call the simulate methods num_iterations times simulating num_gens generations each time,
         and then averaging the frequency of the resulting equilibria. Method calls are parallelized and attempt to
@@ -135,7 +142,7 @@ class GameDynamicsWrapper(object):
         @rtype: numpy.ndarray or dict
         """
         frequencies = numpy.zeros(self.game_cls.num_equilibria())
-        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens) for iteration in range(num_iterations))
+        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, burn=burn) for iteration in range(num_iterations))
 
         for x in output:
             frequencies += x
@@ -287,7 +294,7 @@ class VariedGame(object):
         """
         if 'graph' not in kwargs:
             kwargs['graph'] = dict(type='2d')
-            
+
         return self.vary(game_kwargs={kw: (low, high, num_steps)}, **kwargs)
 
     def vary_2params(self, kw1, low1_high1_num_steps1, kw2, low2_high2_num_steps2, **kwargs):
@@ -323,7 +330,7 @@ class VariedGame(object):
             
         return self.vary(game_kwargs={kw1: (low1, high1, num_steps1), kw2: (low2, high2, num_steps2)}, **kwargs)
 
-    def vary(self, game_kwargs=None, dynamics_kwargs=None, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, graph=False, parallelize=True):
+    def vary(self, game_kwargs=None, dynamics_kwargs=None, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, burn=0, graph=False, parallelize=True):
         """
         We can vary the game kwargs, the dynamics kwargs, as well as any number of indirect inputs, if needed
         Each of these parameters must be an iterable of dictionaries, in the following form:
@@ -389,7 +396,7 @@ class VariedGame(object):
         w = GameDynamicsWrapper(self.game_cls, self.dynamics_cls, self.game_kwargs, self.dynamics_kwargs)
 
         dependent_params = (kwargs[0][1], kwargs[1][1])
-        results = self._vary_kwargs(independent_params, dependent_params, w, num_iterations=num_iterations, num_gens=num_gens, parallelize=parallelize)
+        results = self._vary_kwargs(independent_params, dependent_params, w, num_iterations=num_iterations, num_gens=num_gens, burn=burn, parallelize=parallelize)
 
         data = NDimensionalData.initialize(results, independent_params)
 

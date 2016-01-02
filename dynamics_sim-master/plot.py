@@ -23,7 +23,7 @@ class GraphOptions:
                MARKERS_KEY: "o.v8sh+xD|_ ",
                NO_MARKERS_KEY: False,
                Y_LABEL_KEY: "Proportion of Population",
-               LEGEND_LOCATION_KEY: 'center right',
+               LEGEND_LOCATION_KEY: 'upper left',
                SHOW_GRID_KEY: True,
                TITLE_KEY: lambda player_i: "Population Dynamics for Player %d" % player_i,
                LEGEND_LABELS_KEY: lambda graph_i, cat_i: "X_%d,%d" % (graph_i, cat_i),
@@ -79,9 +79,9 @@ def stackProportions(data):#Turns proportional data into total data
             if not i == 0:
                 generation[i] += generation[i-1] 
                 
-def normalize(value_range):#Normalizes data to 1, useful for type proportions
+def normalize(value_range, normalizeTo=1):#Normalizes data to 1, useful for type proportions
     for i, step in enumerate(value_range):
-        value_range[i] = step / (step + 9)
+        value_range[i] = step / (step + normalizeTo)
     return value_range
 
     
@@ -102,7 +102,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
     colors = graph_options[GraphOptions.COLORS_KEY]
     category_labels = graph_options[GraphOptions.LEGEND_LABELS_KEY]
     markers = graph_options[GraphOptions.MARKERS_KEY]
-    
+
     if graph_options[GraphOptions.PLAYER_TYPES]:
         print("not implemented")
     else:
@@ -115,13 +115,13 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
                 stackProportions(data_i)   
                 
             if 'normalize' in graph_options:
-                x_values = normalize(x_values)
+                x_values = normalize(x_values, graph_options['normalize'])
     
             # iterate over all the generations
             num_xs, n_cats = data_i.shape
     
             plt.xlim([x_values[0], x_values[-1]])
-            plt.ylim([-0.025, 1.025])
+            plt.ylim([-0.02, 1.02])
             plt.ylabel(y_label)
             plt.xlabel(x_label)
             plt.grid(graph_options[GraphOptions.SHOW_GRID_KEY])
@@ -146,7 +146,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
             
             if 'lineArray' in graph_options:
                 graphLines(graph_options['lineArray'], plt)
-        
+
     plt.show()
     
 def plot_contour_data_set(data, y_label, y_values, x_label, x_values, z_label, title, num_categories, graph_options=None):
@@ -156,9 +156,9 @@ def plot_contour_data_set(data, y_label, y_values, x_label, x_values, z_label, t
     category_labels = graph_options[GraphOptions.LEGEND_LABELS_KEY]
     plt.close('all')
     
-    colors = ['DarkSlateGray', 'DarkGreen', 'Green', 'ForestGreen', \
-              'LimeGreen', 'Lime', 'LawnGreen', 'Chartreuse', 'GreenYellow', \
-              'Yellow', 'Khaki', 'PaleGoldenrod', 'LightGoldenrodYellow', \
+    colors = ['DarkSlateGray', 'DarkGreen', 'Green', 'ForestGreen',
+              'LimeGreen', 'Lime', 'LawnGreen', 'Chartreuse', 'GreenYellow',
+              'Yellow', 'Khaki', 'PaleGoldenrod', 'LightGoldenrodYellow',
               'LightYellow', 'White'] 
     
     # iterate over all the generations

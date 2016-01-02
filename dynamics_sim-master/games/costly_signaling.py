@@ -1,12 +1,13 @@
 from games.game import Game
 
+
 class CostlySignaling(Game):
     DEFAULT_PARAMS = dict(lCost=3, hCost=1, a=5, aHigh=10, aLow=-10, lProp=2, hProp=1)
     PLAYER_LABELS = ('Low Sender', 'High Sender', 'Receiver')
     STRATEGY_LABELS = (('No', 'Low', 'Medium', 'High'),
                        ('No', 'Low', 'Medium', 'High'),
                        ('Accept all', 'Accept Low', 'Accept Medium', 'Accept High', 'Reject All'))
-    EQUILIBRIA_LABELS = ('Pooling with rejection', 'Pooling with acceptance', 'Efficient separating', 'Ostentatious separating')
+    EQUILIBRIA_LABELS = ('Pooling with rejection', 'Pooling with acceptance', 'Efficient separating', 'Ostentatious separating', 'Simple Separating')
 
     def __init__(self, lCost, hCost, a, aHigh, aLow, lProp, hProp, equilibrium_tolerance=0.2):
         lProp, hProp = lProp/(lProp+hProp), hProp/(lProp+hProp)
@@ -54,6 +55,8 @@ class CostlySignaling(Game):
             return 2#Efficient separating
         elif state[0][0] >= threshold and state[1][3] >= threshold:
             return 3#Ostentatious
+        elif state[0][0] >= threshold and state[1][1] >= threshold:
+            return 4#Simple separating
         else:
             return super(CostlySignaling, cls).classify(params, state, tolerance)
 

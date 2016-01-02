@@ -1,642 +1,86 @@
-def getLSenderPayoffs(lCost, llSender, lhSender, lReceiverProp, hReceiverProp, lReveal):
-    al = lReceiverProp*llSender #Accepted by low
-    ah = hReceiverProp*lhSender
+def senderPayoffs(cost, lSender, hSender, lReceiverProp, hReceiverProp, reveal, type):
+    payoffs = [[[[[0 for x in range(4)] for x in range(4)] for x in range(3)] for x in range(3)] for x in range(3)]
     
-    payoffs =  [[[[[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]]],
-                  #medium normal
-                 [[[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]]],
-                  #medium hidden
-                 [[[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]]]],
-            #low normal
-                [[[[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]]],
-                 #medium normal
-                 [[[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]]],
-                #medium hidden
-                [[[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]]]],
-            #low hidden
-                [[[[al+ah, al+ah*lReveal, al+ah*lReveal, al],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [ah, ah*lReveal, ah*lReveal, 0]],
-                  [[al+ah, al+ah*lReveal, al+ah*lReveal, al],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [ah, ah*lReveal, ah*lReveal, 0]],
-                  [[al+ah, al+ah*lReveal, al+ah*lReveal, al],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [ah, ah*lReveal, ah*lReveal, 0]]],
-                  #medium normal
-                [[[al+ah, al+ah*lReveal, al+ah*lReveal, al],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [ah, ah*lReveal, ah*lReveal, 0]],
-                  [[al+ah, al+ah*lReveal, al+ah*lReveal, al],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [ah, ah*lReveal, ah*lReveal, 0]],
-                  [[al+ah, al+ah*lReveal, al+ah*lReveal, al],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [ah, ah*lReveal, ah*lReveal, 0]]],
-                   #medium hidden
-                [[[al+ah, al+ah*lReveal, al+ah*lReveal, al],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [ah, ah*lReveal, ah*lReveal, 0]],
-                  [[al+ah, al+ah*lReveal, al+ah*lReveal, al],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [ah, ah*lReveal, ah*lReveal, 0]],
-                  [[al+ah, al+ah*lReveal, al+ah*lReveal, al],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [al*lReveal+ah, al*lReveal+ah*lReveal, al*lReveal+ah*lReveal, al*lReveal],
-                   [ah, ah*lReveal, ah*lReveal, 0]]]]]
-    
-    for index1, LSmove in enumerate(payoffs):
-        for index2, MSmove in enumerate(LSmove):
-            for index3, HSmove in enumerate(MSmove):
-                for index4, LRmove in enumerate(HSmove):
-                    for index5, payoff in enumerate(LRmove):
-                        if index1 > 0:
-                            payoffs[index1][index2][index3][index4][index5] -= lCost
-    
-    return payoffs
-    
-def getMSenderPayoffs(mCost, mlSender, mhSender, lReceiverProp, hReceiverProp, mReveal):
-    al = lReceiverProp*mlSender
-    ah = hReceiverProp*mhSender
-    
-    payoffs =  [[[[[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]]],
-                  #medium normal
-                 [[[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]]],
-                 #medium hidden
-                 [[[al+ah, al+ah*mReveal, al+ah*mReveal, al],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [ah, ah*mReveal, ah*mReveal, 0]],
-                  [[al+ah, al+ah*mReveal, al+ah*mReveal, al],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [ah, ah*mReveal, ah*mReveal, 0]],
-                  [[al+ah, al+ah*mReveal, al+ah*mReveal, al],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [ah, ah*mReveal, ah*mReveal, 0]]]],
-            #low normal
-                [[[[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]]],
-                  #medium normal
-                 [[[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]]],
-                 #medium hidden
-                 [[[al+ah, al+ah*mReveal, al+ah*mReveal, al],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [ah, ah*mReveal, ah*mReveal, 0]],
-                  [[al+ah, al+ah*mReveal, al+ah*mReveal, al],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [ah, ah*mReveal, ah*mReveal, 0]],
-                  [[al+ah, al+ah*mReveal, al+ah*mReveal, al],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [ah, ah*mReveal, ah*mReveal, 0]]]],
-            #low hidden
-                [[[[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]],
-                  [[al+ah, al, al, al],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0],
-                   [ah, 0, 0, 0]]],
-                  #medium normal
-                 [[[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]],
-                  [[al+ah, al+ah, al, al],
-                   [al+ah, al+ah, al, al],
-                   [ah, ah, 0, 0],
-                   [ah, ah, 0, 0]]],
-                 #medium hidden
-                 [[[al+ah, al+ah*mReveal, al+ah*mReveal, al],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [ah, ah*mReveal, ah*mReveal, 0]],
-                  [[al+ah, al+ah*mReveal, al+ah*mReveal, al],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [ah, ah*mReveal, ah*mReveal, 0]],
-                  [[al+ah, al+ah*mReveal, al+ah*mReveal, al],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [al*mReveal+ah, al*mReveal+ah*mReveal, al*mReveal+ah*mReveal, al*mReveal],
-                   [ah, ah*mReveal, ah*mReveal, 0]]]]]
-
-    for index1, LSmove in enumerate(payoffs):
-        for index2, MSmove in enumerate(LSmove):
-            for index3, HSmove in enumerate(MSmove):
-                for index4, LRmove in enumerate(HSmove):
-                    for index5, payoff in enumerate(LRmove):
-                        if index2 > 0:
-                            payoffs[index1][index2][index3][index4][index5] -= mCost
+    for lsIndex, lsMove in enumerate(payoffs):
+        for msIndex, msMove in enumerate(lsMove):
+            for hsIndex, hsMove in enumerate(msMove):
+                for lrIndex, lrMove in enumerate(hsMove):
+                    for hrIndex, payoff in enumerate(lrMove):
+                        if type.lower() == 'low' or type.lower() == 'l':
+                            move = lsIndex
+                        elif type.lower() == 'medium' or type.lower() == 'm':
+                            move = msIndex
+                        elif type.lower() == 'high' or type.lower() == 'h':
+                            move = hsIndex
+                        else:
+                            raise ValueError("Please choose a type")
+                        
+                        if move == 0 or move == 1:#Reveal chance irrelevant
+                            if move >= lrIndex:#sender is accepted by low receivers
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += lSender * lReceiverProp
+                            if move >= hrIndex: 
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += hSender * hReceiverProp
+                        else:#Trying to hide move
+                            if lrIndex == 0:#Accepting all
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += lSender * lReceiverProp
+                            elif lrIndex == 1 or lrIndex == 2: #Accept if a signal appears
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += lSender * lReceiverProp * reveal
+                                
+                            if hrIndex == 0:
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += hSender * hReceiverProp
+                            elif hrIndex == 1 or hrIndex == 2:
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += hSender * hReceiverProp * reveal                            
+                             
+                        if move >= 1:#Pay cost of signal
+                            payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] -= cost
                             
     return payoffs
-    
-def getHSenderPayoffs(hCost, hlSender, hhSender, lReceiverProp, hReceiverProp, hReveal):
-    al = lReceiverProp*hlSender #accepted by low
-    ah = hReceiverProp*hhSender
-    
-    payoffs = [[[[[al+ah, al, al, al],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0]],
-                 [[al+ah, al+ah, al, al],
-                  [al+ah, al+ah, al, al],
-                  [ah, ah, 0, 0],
-                  [ah, ah, 0, 0]],
-                 [[al+ah, al+ah*hReveal, al+ah*hReveal, al],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [ah, ah*hReveal, ah*hReveal, 0]]],
-                #medium normal
-                [[[al+ah, al, al, al],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0]],
-                 [[al+ah, al+ah, al, al],
-                  [al+ah, al+ah, al, al],
-                  [ah, ah, 0, 0],
-                  [ah, ah, 0, 0]],
-                 [[al+ah, al+ah*hReveal, al+ah*hReveal, al],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [ah, ah*hReveal, ah*hReveal, 0]]],
-                #medium hidden
-                [[[al+ah, al, al, al],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0]],
-                 [[al+ah, al+ah, al, al],
-                  [al+ah, al+ah, al, al],
-                  [ah, ah, 0, 0],
-                  [ah, ah, 0, 0]],
-                 [[al+ah, al+ah*hReveal, al+ah*hReveal, al],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [ah, ah*hReveal, ah*hReveal, 0]]]],
-            #low normal   
-               [[[[al+ah, al, al, al],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0]],
-                 [[al+ah, al+ah, al, al],
-                  [al+ah, al+ah, al, al],
-                  [ah, ah, 0, 0],
-                  [ah, ah, 0, 0]],
-                 [[al+ah, al+ah*hReveal, al+ah*hReveal, al],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [ah, ah*hReveal, ah*hReveal, 0]]],
-                #medium normal
-                [[[al+ah, al, al, al],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0]],
-                 [[al+ah, al+ah, al, al],
-                  [al+ah, al+ah, al, al],
-                  [ah, ah, 0, 0],
-                  [ah, ah, 0, 0]],
-                 [[al+ah, al+ah*hReveal, al+ah*hReveal, al],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [ah, ah*hReveal, ah*hReveal, 0]]],
-                #medium hidden
-                [[[al+ah, al, al, al],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0]],
-                 [[al+ah, al+ah, al, al],
-                  [al+ah, al+ah, al, al],
-                  [ah, ah, 0, 0],
-                  [ah, ah, 0, 0]],
-                 [[al+ah, al+ah*hReveal, al+ah*hReveal, al],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [ah, ah*hReveal, ah*hReveal, 0]]]],
-            #low hidden
-               [[[[al+ah, al, al, al],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0]],
-                 [[al+ah, al+ah, al, al],
-                  [al+ah, al+ah, al, al],
-                  [ah, ah, 0, 0],
-                  [ah, ah, 0, 0]],
-                 [[al+ah, al+ah*hReveal, al+ah*hReveal, al],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [ah, ah*hReveal, ah*hReveal, 0]]],
-                #medium normal
-                [[[al+ah, al, al, al],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0]],
-                 [[al+ah, al+ah, al, al],
-                  [al+ah, al+ah, al, al],
-                  [ah, ah, 0, 0],
-                  [ah, ah, 0, 0]],
-                 [[al+ah, al+ah*hReveal, al+ah*hReveal, al],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [ah, ah*hReveal, ah*hReveal, 0]]],
-                #medium hidden
-                [[[al+ah, al, al, al],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0],
-                  [ah, 0, 0, 0]],
-                 [[al+ah, al+ah, al, al],
-                  [al+ah, al+ah, al, al],
-                  [ah, ah, 0, 0],
-                  [ah, ah, 0, 0]],
-                 [[al+ah, al+ah*hReveal, al+ah*hReveal, al],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [al*hReveal+ah, al*hReveal+ah*hReveal, al*hReveal+ah*hReveal, al*hReveal],
-                  [ah, ah*hReveal, ah*hReveal, 0]]]]]
-    
-    for index1, LSmove in enumerate(payoffs):
-        for index2, MSmove in enumerate(LSmove):
-            for index3, HSmove in enumerate(MSmove):
-                for index4, LRmove in enumerate(HSmove):
-                    for index5, payoff in enumerate(LRmove):
-                        if index3 > 0:
-                            payoffs[index1][index2][index3][index4][index5] -= hCost
-                     
-    return payoffs
-    
-def getLReceiverPayoffs(lReveal, mReveal, hReveal, llReceiver, mlReceiver, hlReceiver, lSenderProp, mSenderProp, hSenderProp):
-    al = llReceiver*lSenderProp #accept low
-    am = mlReceiver*mSenderProp
-    ah = hlReceiver*hSenderProp
-    
-    payoffs = (((((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (0, 0, 0, 0),
-                  (0, 0, 0, 0),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (ah, ah, ah, ah),
-                  (0, 0, 0, 0),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (ah*hReveal, ah*hReveal, ah*hReveal, ah*hReveal),
-                  (ah*hReveal, ah*hReveal, ah*hReveal, ah*hReveal),
-                  (0, 0, 0, 0))),
-                #medium normal
-                (((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (am, am, am, am),
-                  (0, 0, 0, 0),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (am+ah, am+ah, am+ah, am+ah),
-                  (0, 0, 0, 0),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (am+ah*hReveal, am+ah*hReveal, am+ah*hReveal, am+ah*hReveal),
-                  (ah*hReveal, ah*hReveal, ah*hReveal, ah*hReveal),
-                  (0, 0, 0, 0))),
-                #medium hidden
-                (((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (am*mReveal, am*mReveal, am*mReveal, am*mReveal),
-                  (am*mReveal, am*mReveal, am*mReveal, am*mReveal),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (am*mReveal+ah, am*mReveal+ah, am*mReveal+ah, am*mReveal+ah),
-                  (am*mReveal, am*mReveal, am*mReveal, am*mReveal),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, am*mReveal+ah*hReveal),
-                  (am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, am*mReveal+ah*hReveal),
-                  (0, 0, 0, 0)))),
-            #low normal
-               ((((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al, al, al, al),
-                  (0, 0, 0, 0),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al+ah, al+ah, al+ah, al+ah),
-                  (0, 0, 0, 0),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al+ah*hReveal, al+ah*hReveal, al+ah*hReveal, al+ah*hReveal),
-                  (ah*hReveal, ah*hReveal, ah*hReveal, ah*hReveal),
-                  (0, 0, 0, 0))),
-                #medium normal
-                (((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al+am, al+am, al+am, al+am),
-                  (0, 0, 0, 0),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (0, 0, 0, 0),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al+am+ah*hReveal, al+am+ah*hReveal, al+am+ah*hReveal, al+am+ah*hReveal),
-                  (ah*hReveal, ah*hReveal, ah*hReveal, ah*hReveal),
-                  (0, 0, 0, 0))),
-                #medium hidden
-                (((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al+am*mReveal, al+am*mReveal, al+am*mReveal, al+am*mReveal),
-                  (am*mReveal, am*mReveal, am*mReveal, am*mReveal),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al+am*mReveal+ah, al+am*mReveal+ah, al+am*mReveal+ah, al+am*mReveal+ah),
-                  (am*mReveal, am*mReveal, am*mReveal, am*mReveal),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al+am*mReveal+ah*hReveal, al+am*mReveal+ah*hReveal, al+am*mReveal+ah*hReveal, al+am*mReveal+ah*hReveal),
-                  (am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, am*mReveal+ah*hReveal),
-                  (0, 0, 0, 0)))),
-            #low hidden
-               ((((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al*lReveal, al*lReveal, al*lReveal, al*lReveal),
-                  (al*lReveal, al*lReveal, al*lReveal, al*lReveal),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (ah+al*lReveal, ah+al*lReveal, ah+al*lReveal, ah+al*lReveal),
-                  (al*lReveal, al*lReveal, al*lReveal, al*lReveal),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (ah*hReveal+al*lReveal, ah*hReveal+al*lReveal, ah*hReveal+al*lReveal, ah*hReveal+al*lReveal),
-                  (ah*hReveal+al*lReveal, ah*hReveal+al*lReveal, ah*hReveal+al*lReveal, ah*hReveal+al*lReveal),
-                  (0, 0, 0, 0))),
-                #medium normal
-                (((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (am+al*lReveal, am+al*lReveal, am+al*lReveal, am+al*lReveal),
-                  (al*lReveal, al*lReveal, al*lReveal, al*lReveal),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (am+ah+al*lReveal, am+ah+al*lReveal, am+ah+al*lReveal, am+ah+al*lReveal),
-                  (al*lReveal, al*lReveal, al*lReveal, al*lReveal),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (am+al*lReveal+ah*hReveal, am+al*lReveal+ah*hReveal, am+al*lReveal+ah*hReveal, am+al*lReveal+ah*hReveal),
-                  (al*lReveal+ah*hReveal, al*lReveal+ah*hReveal, al*lReveal+ah*hReveal, al*lReveal+ah*hReveal),
-                  (0, 0, 0, 0))),
-                #medium hidden
-                (((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al*lReveal+am*mReveal, al*lReveal+am*mReveal, al*lReveal+am*mReveal, al*lReveal+am*mReveal),
-                  (al*lReveal+am*mReveal, al*lReveal+am*mReveal, al*lReveal+am*mReveal, al*lReveal+am*mReveal),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al*lReveal+am*mReveal+ah, al*lReveal+am*mReveal+ah, al*lReveal+am*mReveal+ah, al*lReveal+am*mReveal+ah),
-                  (al*lReveal+am*mReveal, al*lReveal+am*mReveal, al*lReveal+am*mReveal, al*lReveal+am*mReveal),
-                  (0, 0, 0, 0)),
-                 ((al+am+ah, al+am+ah, al+am+ah, al+am+ah),
-                  (al*lReveal+am*mReveal+ah*hReveal, al*lReveal+am*mReveal+ah*hReveal, al*lReveal+am*mReveal+ah*hReveal, al*lReveal+am*mReveal+ah*hReveal),
-                  (al*lReveal+am*mReveal+ah*hReveal, al*lReveal+am*mReveal+ah*hReveal, al*lReveal+am*mReveal+ah*hReveal, al*lReveal+am*mReveal+ah*hReveal),
-                  (0, 0, 0, 0)))))
-    
-    return payoffs
 
-def getHReceiverPayoffs(lReveal, mReveal, hReveal, lhReceiver, mhReceiver, hhReceiver, lSenderProp, mSenderProp, hSenderProp):
-    al = lhReceiver*lSenderProp #accept low
-    am = mhReceiver*mSenderProp
-    ah = hhReceiver*hSenderProp
+
+def receiverPayoffs(lReveal, mReveal, hReveal, lReceiver, mReceiver, hReceiver, lSenderProp, mSenderProp, hSenderProp, type):
+    payoffs = [[[[[0 for x in range(4)] for x in range(4)] for x in range(3)] for x in range(3)] for x in range(3)]
+    al = lReceiver * lSenderProp
+    am = mReceiver * mSenderProp
+    ah = hReceiver * hSenderProp
     
-    payoffs = (((((al+am+ah, 0, 0, 0),
-                  (al+am+ah, 0, 0, 0),
-                  (al+am+ah, 0, 0, 0),
-                  (al+am+ah, 0, 0, 0)),
-                 ((al+am+ah, ah, 0, 0),
-                  (al+am+ah, ah, 0, 0),
-                  (al+am+ah, ah, 0, 0),
-                  (al+am+ah, ah, 0, 0)),
-                 ((al+am+ah, ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, ah*hReveal, ah*hReveal, 0))),
-                #medium normal
-                (((al+am+ah, am, 0, 0),
-                  (al+am+ah, am, 0, 0),
-                  (al+am+ah, am, 0, 0),
-                  (al+am+ah, am, 0, 0)),
-                 ((al+am+ah, am+ah, 0, 0),
-                  (al+am+ah, am+ah, 0, 0),
-                  (al+am+ah, am+ah, 0, 0),
-                  (al+am+ah, am+ah, 0, 0)),
-                 ((al+am+ah, am+ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, am+ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, am+ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, am+ah*hReveal, ah*hReveal, 0))),
-                #medium hidden
-                (((al+am+ah, am*mReveal, am*mReveal, 0),
-                  (al+am+ah, am*mReveal, am*mReveal, 0),
-                  (al+am+ah, am*mReveal, am*mReveal, 0),
-                  (al+am+ah, am*mReveal, am*mReveal, 0)),
-                 ((al+am+ah, am*mReveal+ah, am*mReveal, 0),
-                  (al+am+ah, am*mReveal+ah, am*mReveal, 0),
-                  (al+am+ah, am*mReveal+ah, am*mReveal, 0),
-                  (al+am+ah, am*mReveal+ah, am*mReveal, 0)),
-                 ((al+am+ah, am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, 0),
-                  (al+am+ah, am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, 0),
-                  (al+am+ah, am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, 0),
-                  (al+am+ah, am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, 0)))),
-            #low normal
-               ((((al+am+ah, al, 0, 0),
-                  (al+am+ah, al, 0, 0),
-                  (al+am+ah, al, 0, 0),
-                  (al+am+ah, al, 0, 0)),
-                 ((al+am+ah, al+ah, 0, 0),
-                  (al+am+ah, al+ah, 0, 0),
-                  (al+am+ah, al+ah, 0, 0),
-                  (al+am+ah, al+ah, 0, 0)),
-                 ((al+am+ah, al+ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, al+ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, al+ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, al+ah*hReveal, ah*hReveal, 0))),
-                #medium normal
-                (((al+am+ah, al+am, 0, 0),
-                  (al+am+ah, al+am, 0, 0),
-                  (al+am+ah, al+am, 0, 0),
-                  (al+am+ah, al+am, 0, 0)),
-                 ((al+am+ah, al+am+ah, 0, 0),
-                  (al+am+ah, al+am+ah, 0, 0),
-                  (al+am+ah, al+am+ah, 0, 0),
-                  (al+am+ah, al+am+ah, 0, 0)),
-                 ((al+am+ah, al+am+ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, al+am+ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, al+am+ah*hReveal, ah*hReveal, 0),
-                  (al+am+ah, al+am+ah*hReveal, ah*hReveal, 0))),
-                #medium hidden
-                (((al+am+ah, al+am*mReveal, am*mReveal, 0),
-                  (al+am+ah, al+am*mReveal, am*mReveal, 0),
-                  (al+am+ah, al+am*mReveal, am*mReveal, 0),
-                  (al+am+ah, al+am*mReveal, am*mReveal, 0)),
-                 ((al+am+ah, al+am*mReveal+ah, am*mReveal, 0),
-                  (al+am+ah, al+am*mReveal+ah, am*mReveal, 0),
-                  (al+am+ah, al+am*mReveal+ah, am*mReveal, 0),
-                  (al+am+ah, al+am*mReveal+ah, am*mReveal, 0)),
-                 ((al+am+ah, al+am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, 0),
-                  (al+am+ah, al+am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, 0),
-                  (al+am+ah, al+am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, 0),
-                  (al+am+ah, al+am*mReveal+ah*hReveal, am*mReveal+ah*hReveal, 0)))),
-            #low hidden
-               ((((al+am+ah, al*lReveal, al*lReveal, 0),
-                  (al+am+ah, al*lReveal, al*lReveal, 0),
-                  (al+am+ah, al*lReveal, al*lReveal, 0),
-                  (al+am+ah, al*lReveal, al*lReveal, 0)),
-                 ((al+am+ah, al*lReveal+ah, al*lReveal, 0),
-                  (al+am+ah, al*lReveal+ah, al*lReveal, 0),
-                  (al+am+ah, al*lReveal+ah, al*lReveal, 0),
-                  (al+am+ah, al*lReveal+ah, al*lReveal, 0)),
-                 ((al+am+ah, al*lReveal+ah*hReveal, al*lReveal+ah*hReveal, 0),
-                  (al+am+ah, al*lReveal+ah*hReveal, al*lReveal+ah*hReveal, 0),
-                  (al+am+ah, al*lReveal+ah*hReveal, al*lReveal+ah*hReveal, 0),
-                  (al+am+ah, al*lReveal+ah*hReveal, al*lReveal+ah*hReveal, 0))),
-                #medium normal
-                (((al+am+ah, al*lReveal+am, al*lReveal, 0),
-                  (al+am+ah, al*lReveal+am, al*lReveal, 0),
-                  (al+am+ah, al*lReveal+am, al*lReveal, 0),
-                  (al+am+ah, al*lReveal+am, al*lReveal, 0)),
-                 ((al+am+ah, al*lReveal+am+ah, al*lReveal, 0),
-                  (al+am+ah, al*lReveal+am+ah, al*lReveal, 0),
-                  (al+am+ah, al*lReveal+am+ah, al*lReveal, 0),
-                  (al+am+ah, al*lReveal+am+ah, al*lReveal, 0)),
-                 ((al+am+ah, al*lReveal+am+ah*hReveal, al*lReveal+ah*hReveal, 0),
-                  (al+am+ah, al*lReveal+am+ah*hReveal, al*lReveal+ah*hReveal, 0),
-                  (al+am+ah, al*lReveal+am+ah*hReveal, al*lReveal+ah*hReveal, 0),
-                  (al+am+ah, al*lReveal+am+ah*hReveal, al*lReveal+ah*hReveal, 0))),
-                #medium hidden
-                (((al+am+ah, al*lReveal+am*mReveal, al*lReveal+am*mReveal, 0),
-                  (al+am+ah, al*lReveal+am*mReveal, al*lReveal+am*mReveal, 0),
-                  (al+am+ah, al*lReveal+am*mReveal, al*lReveal+am*mReveal, 0),
-                  (al+am+ah, al*lReveal+am*mReveal, al*lReveal+am*mReveal, 0)),
-                 ((al+am+ah, al*lReveal+am*mReveal+ah, al*lReveal+am*mReveal, 0),
-                  (al+am+ah, al*lReveal+am*mReveal+ah, al*lReveal+am*mReveal, 0),
-                  (al+am+ah, al*lReveal+am*mReveal+ah, al*lReveal+am*mReveal, 0),
-                  (al+am+ah, al*lReveal+am*mReveal+ah, al*lReveal+am*mReveal, 0)),
-                 ((al+am+ah, al*lReveal+am*mReveal+ah*hReveal, al*lReveal+am*mReveal+ah*hReveal, 0),
-                  (al+am+ah, al*lReveal+am*mReveal+ah*hReveal, al*lReveal+am*mReveal+ah*hReveal, 0),
-                  (al+am+ah, al*lReveal+am*mReveal+ah*hReveal, al*lReveal+am*mReveal+ah*hReveal, 0),
-                  (al+am+ah, al*lReveal+am*mReveal+ah*hReveal, al*lReveal+am*mReveal+ah*hReveal, 0)))))
-                  
+    for lsIndex, lsMove in enumerate(payoffs):
+        for msIndex, msMove in enumerate(lsMove):
+            for hsIndex, hsMove in enumerate(msMove):
+                for lrIndex, lrMove in enumerate(hsMove):
+                    for hrIndex, payoff in enumerate(lrMove):
+                        if type.lower() == 'low' or type.lower() == 'l':
+                            move = lrIndex
+                        elif type.lower() == 'high' or type.lower() == 'h':
+                            move = hrIndex
+                        else:
+                            raise ValueError("Please choose a valid type: l or h")
+                            
+                        if move == 0:#Accept everyone
+                            payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += al + am + ah
+                        elif move == 1:#Accept signals
+                            if lsIndex == 1:#Normal
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += al
+                            if msIndex == 1:
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += am
+                            if hsIndex == 1:
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += ah
+                                
+                            if lsIndex == 2:#Hidden
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += al * lReveal
+                            if msIndex == 2:
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += am * mReveal
+                            if hsIndex == 2:
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += ah * hReveal
+                        elif move == 2:#Only accept hidden
+                            if lsIndex == 2:#Hidden
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += al * lReveal
+                            if msIndex == 2:
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += am * mReveal
+                            if hsIndex == 2:
+                                payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] += ah * hReveal
+                        elif move == 3:#Reject all
+                            payoffs[lsIndex][msIndex][hsIndex][lrIndex][hrIndex] = 0
+                        else:
+                            raise ValueError("HUH?")
+                                
     return payoffs
-    
-    

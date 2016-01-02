@@ -28,6 +28,7 @@ def senderPayoffs(normalCost, hiddenCost, lSender, hSender, lReceiverProp, hRece
    
     return payoffs
 
+
 def receiverPayoffs(lReceiver, hReceiver, receiverCost, lSenderProp, hSenderProp, type):
 
     payoffs = [[[[0 for x in range(8)] for x in range(8)] for x in range(3)] for x in range(3)]
@@ -49,5 +50,6 @@ def receiverPayoffs(lReceiver, hReceiver, receiverCost, lSenderProp, hSenderProp
                         payoffs[LSindex][HSindex][LRindex][HRindex] += hReceiver * hSenderProp
                     if accepting in accept[2]:#Pay cost of investing to recognize the hidden signals
                         payoffs[LSindex][HSindex][LRindex][HRindex] -= receiverCost          
-    
+
+    print(payoffs[0][1][5][5])
     return payoffs
