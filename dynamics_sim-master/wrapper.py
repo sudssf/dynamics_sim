@@ -60,7 +60,7 @@ class GameDynamicsWrapper(object):
     def stationaryDistribution(self):
         pass
 
-    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=dict(on=1), burn=0, return_labeled=True):
+    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=True, burn=0, return_labeled=True):
         """
         Simulate the game for the given number of generations with the specified dynamics class and optionally graph the results
 
@@ -85,7 +85,6 @@ class GameDynamicsWrapper(object):
         frequencies = numpy.zeros(self.game_cls.num_equilibria())  # one extra for the Unclassified key
 
         if burn:
-            print(burn)
             for index, array in enumerate(results):
                 results[index] = array[burn:]
 
@@ -104,6 +103,8 @@ class GameDynamicsWrapper(object):
             frequencies[classification] = 1
 
         if graph:
+            if graph is True:
+                graph = dict()  #TODO clean up to convert from bool to dict
             graph_options = graph
             if game.STRATEGY_LABELS is not None:
                 graph_options[GraphOptions.LEGEND_LABELS_KEY] = lambda p, s: game.STRATEGY_LABELS[p][s]

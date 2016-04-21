@@ -218,7 +218,6 @@ def plot_3d_data_set(data, x_label, x_values, y_label, y_values, z_label, title,
 
     dim = int(numpy.ceil(numpy.sqrt(n_cats)))
     for cat_i in range(n_cats):
-        # print cat_i
         ax = fig.add_subplot(dim, dim, cat_i + 1, projection='3d')
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)

@@ -115,7 +115,6 @@ class DynamicsSimulator(object):
                 distribution_for_player = lambda n_p, n_s: np.random.dirichlet([1] * n_s) * n_p
 
             state = [distribution_for_player(n_p, n_s) for n_p, n_s in zip(self.num_players, self.pm.num_strats)]
-                
         strategies = [np.zeros((num_gens, x)) for x in self.pm.num_strats]
         
         # record initial state
