@@ -5,15 +5,14 @@ from games.payoff_matrices.ctsDisc import generatePayoffs
 n = 7  # Number of distinct values
 m = n + 1
 stratOptions = ['Punish iff S > ' + str(value) + '/' + str(n) for value in range(0, m)]
-#4, 0, 2, 4
 
 class CtsDisc(SymmetricNPlayerGame):
     DEFAULT_PARAMS = dict(a=4, b=0, c=2, d=4, errorRange=1/5)
     PLAYER_LABELS = ['Judge']
     STRATEGY_LABELS = (["Always Punish"] + stratOptions + ["Never Punish"])
-    EQUILIBRIA_LABELS = ('Never punish', 'Always punish', 'Coordinate on punishment')
+    EQUILIBRIA_LABELS = ('Always punish', 'Never Punish', 'Coordinate on punishment')
 
-    def __init__(self, a, b, c, d, errorRange, equilibrium_tolerance=0.3):
+    def __init__(self, a, b, c, d, errorRange, equilibrium_tolerance=0.2):
         payoff_matrix_p1 = [[0 for _ in range(m+2)] for _ in range(m+2)]
         payoff_matrix_p2 = [[0 for _ in range(m+2)] for _ in range(m+2)]
 
@@ -50,4 +49,12 @@ class CtsDisc(SymmetricNPlayerGame):
     def classify(cls, params, state, tolerance):
         threshold = 1-tolerance
 
+        if state[0][0] > threshold:
+            return 0  # Always punish
+        elif state[0][m+1] > threshold:
+            return 1  # Never punish
+        else:
+            for value in range(1, m+1):
+                if state[0][value] > threshold:
+                    return 2  # Coordination on threshold
         return super(CtsDisc, cls).classify(params, state, tolerance)

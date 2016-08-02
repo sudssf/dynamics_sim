@@ -9,7 +9,7 @@ from games.cts_disc import CtsDisc
 
 import unittest
 
-state = [(0, 0, 0, 0, 0, 0, 0, 100, 0, 0)]
+state = [(0, 0, 0, 0, 0, 0, 0, 0, 100, 0)]
 
 class TestCase(unittest.TestCase):
     def setUp(self):
@@ -18,21 +18,19 @@ class TestCase(unittest.TestCase):
 
     def test_single_simulation(self):
         s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=.3))
-        #s.simulate(num_gens=10, graph=dict(area=True, shading='redBlue'))#, start_state=state)
+        s.simulate(num_gens=203, graph=False)#dict(area=True, shading='redBlue'))#, start_state=state)
 
     def test_single_population(self):
         s = GameDynamicsWrapper(HawkDove, WrightFisher, dynamics_kwargs=dict(selection_strength=0.15))
         #s.simulate(num_gens=2000, graph=dict(area=True))
 
     def test_many_simulation(self):  # Determines which equilibria result based upon several simulations, text output
-        s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=.3))
-        s.simulate_many(num_iterations=1000, num_gens=200, graph=dict(area=True, shading='redBlue'))
+        s = GameDynamicsWrapper(CtsDisc, WrightFisher)
+        print(s.simulate_many(num_iterations=100, num_gens=100, graph=False, class_end=True))#dict(area=True, shading='redBlue')))
 if __name__ == '__main__':
     unittest.main()
 
 if False:
-
-
     def calculate_stationary(self):
         s = GameDynamicsWrapper(Coordination, Moran)
         s.stationaryDistribution()

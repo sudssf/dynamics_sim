@@ -21,6 +21,7 @@ class WrightFisher(StochasticDynamicsSimulator):
             num_strats = len(strategy_distribution)
             total_mutations = 0
             new_player_state = np.zeros(num_strats)
+
             for strategy_idx, n in enumerate(strategy_distribution):
                 f = fitness[player_idx][strategy_idx]
 

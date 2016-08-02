@@ -60,7 +60,7 @@ class GameDynamicsWrapper(object):
     def stationaryDistribution(self):
         pass
 
-    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=True, burn=0, return_labeled=True, start_state=None):
+    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=True, burn=0, return_labeled=True, start_state=None, class_end=False):
         """
         Simulate the game for the given number of generations with the specified dynamics class and optionally graph the results
 
@@ -90,12 +90,22 @@ class GameDynamicsWrapper(object):
 
         if dyn.stochastic:
             classifications = []
-            for state in zip(*results):
-                state = [x / x.sum() for x in state]
-                equi = game.classify(params, state, game.equilibrium_tolerance)
-                # note, if equi returns -1, then the -1 index gets the last entry in the array
-                classifications.append(equi)
-                frequencies[equi] += 1
+            if class_end:  # Only classify the final generation
+                lastGenerationState = [numpy.zeros(len(player[0])) for player in results]
+                for playerIdx, player in enumerate(results):
+                    for stratIdx, strat in enumerate(player[-1]):
+                        lastGenerationState[playerIdx][stratIdx] = strat
+                    lastGenerationState[playerIdx] /= lastGenerationState[playerIdx].sum()
+                equi = game.classify(params, lastGenerationState, game.equilibrium_tolerance)
+                frequencies = numpy.zeros(self.game_cls.num_equilibria())
+                frequencies[equi] = 1
+            else:  # Classify every generation
+                for state in zip(*results):
+                    state = [x / x.sum() for x in state]
+                    equi = game.classify(params, state, game.equilibrium_tolerance)
+                    # note, if equi returns -1, then the -1 index gets the last entry in the array
+                    classifications.append(equi)
+                    frequencies[equi] += 1
         else:
             last_generation_state = results[-1]
             classification = game.classify(params, last_generation_state, game.equilibrium_tolerance)
@@ -123,7 +133,7 @@ class GameDynamicsWrapper(object):
                 return frequencies, results
 
 
-    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, return_labeled=True, burn=0, parallelize=True, graph=False):
+    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, return_labeled=True, burn=0, parallelize=True, graph=False, start_state=None, class_end=False):
         """
         A helper method to call the simulate methods num_iterations times simulating num_gens generations each time,
         and then averaging the frequency of the resulting equilibria. Method calls are parallelized and attempt to
@@ -147,7 +157,7 @@ class GameDynamicsWrapper(object):
                                 player_frequencies=game.player_frequencies,
                                 **self.dynamics_kwargs)
         frequencies = numpy.zeros(self.game_cls.num_equilibria())
-        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, burn=burn) for iteration in range(num_iterations))
+        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, burn=burn, start_state=start_state, class_end=class_end) for iteration in range(num_iterations))
 
         equilibria = []
         strategies = [0]*num_iterations

@@ -102,7 +102,7 @@ class DynamicsSimulator(object):
         @return: the list of states that the simulation steps through in each generation
         @rtype: list(2x2 array)
         """
-        
+
         if debug_state is not None:
             state = self.validate_state(debug_state)
         else:
@@ -116,7 +116,8 @@ class DynamicsSimulator(object):
 
             state = [distribution_for_player(n_p, n_s) for n_p, n_s in zip(self.num_players, self.pm.num_strats)]
         strategies = [np.zeros((num_gens, x)) for x in self.pm.num_strats]
-        
+        payoffs = [np.zeros((num_gens, x)) for x in self.pm.num_strats]
+
         # record initial state
         for i, x in enumerate(state):
             strategies[i][0, :] = x

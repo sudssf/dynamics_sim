@@ -22,13 +22,13 @@ def par_for(p=True):
     return Parallel(n_jobs=n_jobs)
 
 
-def wrapper_simulate(wrapper, num_gens, burn=0):
+def wrapper_simulate(wrapper, num_gens, burn=0, start_state=None, class_end=False):
     """
     The multiprocessing library requires that the function called is globally importable, and it doesn't work with
     instance methods. Therefore, this is the method corresponding to the L{GameDynamicsWrapper} classes's simulate method
     so that multiple simulations can be run in parallel. This function does not need to be called directly.
     """
-    return wrapper.simulate(num_gens=num_gens, graph=False, burn=burn, return_labeled=False)
+    return wrapper.simulate(num_gens=num_gens, graph=False, burn=burn, return_labeled=False, start_state=start_state, class_end=class_end)
 
 
 def wrapper_vary_for_kwargs(wrapper, *args, **kwargs):
