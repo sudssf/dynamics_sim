@@ -5,7 +5,7 @@ from dynamics.dynamics import StochasticDynamicsSimulator
 
 class WrightFisher(StochasticDynamicsSimulator):
     def __init__(self, mu=0.05, *args, **kwargs):
-        # TODO: don't allow pop_size of 0, wright fisher only works with finite pop size
+        # TODO don't allow pop_size of 0, wright fisher only works with finite pop size
         super(WrightFisher, self).__init__(*args, **kwargs)
         self.mu = mu
 

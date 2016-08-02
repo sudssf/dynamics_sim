@@ -129,6 +129,7 @@ class DynamicsSimulator(object):
         
         return strategies
 
+
     @staticmethod
     def round_individuals(unrounded_frequencies):
         """
@@ -182,7 +183,7 @@ class StochasticDynamicsSimulator(DynamicsSimulator):
         """
         super(StochasticDynamicsSimulator, self).__init__(*args, stochastic=True, **kwargs)
         if fitness_func is None:
-            fitness_func = lambda p, w: math.e**(p*w)
+            fitness_func = lambda p, w: math.e**(p*w)  # TODO it seems that overly large payoffs can lead to overflow errors
         self.fitness_func = lambda payoff: float(fitness_func(payoff, selection_strength))
 
 
@@ -203,8 +204,8 @@ class StochasticDynamicsSimulator(DynamicsSimulator):
         """
         # Calculate expected payoffs each player gets by playing a particular strategy based on the current state
         payoff = [[self.pm.get_expected_payoff(p_idx, s_idx, state)
-                   for s_idx in range(num_strats_i)]
-                  for p_idx, num_strats_i in enumerate(self.pm.num_strats)]
+                       for s_idx in range(num_strats_i)]
+                      for p_idx, num_strats_i in enumerate(self.pm.num_strats)]
 
         # Calculate fitness for each individual in the population (based on what strategy they are playing)
         return [[self.fitness_func(p) for p in j] for j in payoff]

@@ -2,7 +2,7 @@ from games.game import Game
 
 
 class CostlySignaling(Game):
-    DEFAULT_PARAMS = dict(lCost=3, hCost=1, a=5, aHigh=10, aLow=-10, lProp=2, hProp=1)
+    DEFAULT_PARAMS = dict(lCost=1, hCost=1, a=5, aHigh=10, aLow=-10, lProp=2, hProp=1)
     PLAYER_LABELS = ('Low Sender', 'High Sender', 'Receiver')
     STRATEGY_LABELS = (('No', 'Low', 'Medium', 'High'),
                        ('No', 'Low', 'Medium', 'High'),

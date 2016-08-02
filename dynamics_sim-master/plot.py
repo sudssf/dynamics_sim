@@ -7,8 +7,16 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import math
 
+blueShades = [(0, 0, 0), (25, 25, 112), (0, 0, 128), (0, 0, 205), (0, 0, 225), (30, 144, 255), (0, 191, 255),
+              (135, 206, 250), (173, 216, 230), (200, 255, 255), (255, 255, 255)]
+
+redBlueShades = [(229, 0, 15), (206, 3, 32), (183, 7, 50), (160, 11, 67), (137, 15, 85), (114, 19, 103), (91, 22, 120),
+                 (68, 26, 138), (45, 30, 155), (22, 34, 173)]
+
 class GraphOptions:
     COLORS_KEY = 'colors'
+    BLUE_COLORS_KEY = 'Blue gradient'
+    RED_TO_BLUE_COLORS_KEY = 'Red to Blue gradient'
     EXTRA_COLORS = 'extra colors if more than 7 to be shown'
     Y_LABEL_KEY = 'y_label'
     LEGEND_LOCATION_KEY = 'legend_location'
@@ -19,11 +27,13 @@ class GraphOptions:
     NO_MARKERS_KEY = 'hide_markers'
     PLAYER_TYPES = 'Group certain graphs'
 
-    default = {COLORS_KEY: ['Cyan', 'Blue', 'Green', 'Yellow', 'Red', 'Magenta', 'Black', 'BlueViolet', 'Crimson', 'Indigo'],
+    default = {COLORS_KEY: ['Cyan', 'Blue', 'Green', 'Yellow', 'Red', 'Magenta', 'Black', 'BlueViolet', 'Crimson', 'Indigo'] * 5,  # If extra colors needed it repeats
+               BLUE_COLORS_KEY: [(value[0]/255, value[1]/255, value[2]/255) for value in blueShades],
+               RED_TO_BLUE_COLORS_KEY: [(value[0]/255, value[1]/255, value[2]/255) for value in redBlueShades],
                MARKERS_KEY: "o.v8sh+xD|_ ",
                NO_MARKERS_KEY: False,
                Y_LABEL_KEY: "Proportion of Population",
-               LEGEND_LOCATION_KEY: 'upper left',
+               LEGEND_LOCATION_KEY: 'upper right',
                SHOW_GRID_KEY: True,
                TITLE_KEY: lambda player_i: "Population Dynamics for Player %d" % player_i,
                LEGEND_LABELS_KEY: lambda graph_i, cat_i: "X_%d,%d" % (graph_i, cat_i),
@@ -73,13 +83,14 @@ def graphLines(lineArray, plt):
         plt.plot([line[0], line[1]], [line[2], line[3]], 'k-', lw=1)
 
 
-def stackProportions(data):#Turns proportional data into total data
+def stackProportions(data):  # Turns proportional data into total data
     for generation in data:
         for i, cat in enumerate(generation):
             if not i == 0:
                 generation[i] += generation[i-1] 
-                
-def normalize(value_range, normalizeTo=1):#Normalizes data to 1, useful for type proportions
+
+
+def normalize(value_range, normalizeTo=1):  # Normalizes data to 1, useful for type proportions
     for i, step in enumerate(value_range):
         value_range[i] = step / (step + normalizeTo)
     return value_range
@@ -99,7 +110,33 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
 
     graph_options = _append_options(graph_options)
 
-    colors = graph_options[GraphOptions.COLORS_KEY]
+    #Determine coloration
+    if 'shading' in graph_options:
+        shading = graph_options['shading'].lower()
+        if ',' in shading:
+            color, different = graph_options['shading'].split(',')
+            different = int(different)
+        else:
+            color = shading
+            different = 10
+
+        shading = [value / different for value in range(different)]
+        lightShading = [value / (different * 3) for value in range(different)]
+
+        if color == 'blue':
+            colors = [(0, 0, value) for idx, value in enumerate(shading)]
+        elif color == 'green':
+            colors = [(lightShading[idx], value, lightShading[idx]) for idx, value in enumerate(shading)]
+        elif color == 'red':
+            colors = [(value, lightShading[idx], lightShading[idx]) for idx, value in enumerate(shading)]
+        elif color == 'redblue':
+            colors = graph_options[GraphOptions.RED_TO_BLUE_COLORS_KEY]
+        else:
+            print('Please enter a valid color!')
+            colors = graph_options[GraphOptions.COLORS_KEY]
+    else:
+        colors = graph_options[GraphOptions.COLORS_KEY]
+
     category_labels = graph_options[GraphOptions.LEGEND_LABELS_KEY]
     markers = graph_options[GraphOptions.MARKERS_KEY]
 
@@ -121,11 +158,11 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
             num_xs, n_cats = data_i.shape
     
             plt.xlim([x_values[0], x_values[-1]])
-            plt.ylim([-0.02, 1.02])
+            plt.ylim([-0.01, 1.01])
             plt.ylabel(y_label)
             plt.xlabel(x_label)
             plt.grid(graph_options[GraphOptions.SHOW_GRID_KEY])
-    
+
             # iterate over all the categories
             for cat_i in range(n_cats):
                 if graph_options[GraphOptions.NO_MARKERS_KEY]:

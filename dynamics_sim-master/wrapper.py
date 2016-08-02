@@ -60,7 +60,7 @@ class GameDynamicsWrapper(object):
     def stationaryDistribution(self):
         pass
 
-    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=True, burn=0, return_labeled=True):
+    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=True, burn=0, return_labeled=True, start_state=None):
         """
         Simulate the game for the given number of generations with the specified dynamics class and optionally graph the results
 
@@ -78,7 +78,7 @@ class GameDynamicsWrapper(object):
         dyn = self.dynamics_cls(payoff_matrix=game.pm,
                                 player_frequencies=game.player_frequencies,
                                 **self.dynamics_kwargs)
-        results = dyn.simulate(num_gens=num_gens)
+        results = dyn.simulate(num_gens=num_gens, debug_state=start_state)
         # results_obj = SingleSimulationOutcome(self.dynamics_cls, self.dynamics_kwargs, self.game_cls, self.game_kwargs, results)
         # TODO: serialize results to file
         params = Obj(**self.game_kwargs)
@@ -96,7 +96,6 @@ class GameDynamicsWrapper(object):
                 # note, if equi returns -1, then the -1 index gets the last entry in the array
                 classifications.append(equi)
                 frequencies[equi] += 1
-
         else:
             last_generation_state = results[-1]
             classification = game.classify(params, last_generation_state, game.equilibrium_tolerance)
@@ -121,9 +120,10 @@ class GameDynamicsWrapper(object):
             if return_labeled:
                 return self._convert_equilibria_frequencies(frequencies)
             else:
-                return frequencies
+                return frequencies, results
 
-    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, return_labeled=True, burn=0, parallelize=True):
+
+    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, return_labeled=True, burn=0, parallelize=True, graph=False):
         """
         A helper method to call the simulate methods num_iterations times simulating num_gens generations each time,
         and then averaging the frequency of the resulting equilibria. Method calls are parallelized and attempt to
@@ -142,13 +142,52 @@ class GameDynamicsWrapper(object):
         @return: the frequency of time spent in each equilibria, defined by the game
         @rtype: numpy.ndarray or dict
         """
+        game = self.game_cls(**self.game_kwargs)
+        dyn = self.dynamics_cls(payoff_matrix=game.pm,
+                                player_frequencies=game.player_frequencies,
+                                **self.dynamics_kwargs)
         frequencies = numpy.zeros(self.game_cls.num_equilibria())
         output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, burn=burn) for iteration in range(num_iterations))
 
-        for x in output:
+        equilibria = []
+        strategies = [0]*num_iterations
+        for idx, sim in enumerate(output):
+            equilibria.append(sim[0])
+            strategies[idx] = sim[1]
+
+        stratAvg = [numpy.zeros(shape=(num_gens, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
+        for iteration in range(num_iterations):
+            for player in range(dyn.pm.num_player_types):
+                for gen in range(num_gens):
+                    for strat in range(dyn.pm.num_strats[player]):
+                        stratAvg[player][gen][strat] += strategies[iteration][player][gen][strat]
+
+        for playerIdx, player in enumerate(stratAvg):
+            for genIdx, gen in enumerate(player):
+                gen /= gen.sum()
+                gen *= dyn.num_players
+
+        if graph:
+            if graph is True:
+                graph = dict()  #TODO clean up to convert from bool to dict
+            graph_options = graph
+            if game.STRATEGY_LABELS is not None:
+                graph_options[GraphOptions.LEGEND_LABELS_KEY] = lambda p, s: game.STRATEGY_LABELS[p][s]
+
+            if game.PLAYER_LABELS is not None:
+                graph_options[GraphOptions.TITLE_KEY] = lambda p: game.PLAYER_LABELS[p]
+
+            graph_options[GraphOptions.NO_MARKERS_KEY] = True
+
+            plot_data_for_players(stratAvg, range(burn, num_gens), "Generation #", dyn.pm.num_strats,
+                                  num_players=dyn.num_players,
+                                  graph_options=graph_options)
+
+        for x in equilibria:
             frequencies += x
 
         frequencies /= frequencies.sum()
+
         if return_labeled:
             return self._convert_equilibria_frequencies(frequencies)
         else:

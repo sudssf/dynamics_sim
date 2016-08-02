@@ -12,14 +12,14 @@ class PayoffMatrix(object):
 
     def __init__(self, num_players, payoff_matrices):
         self.num_player_types = num_players
-
         self.payoff_matrices = payoff_matrices
         self.num_strats = []
         root = self.payoff_matrices[0]
         for i in range(self.num_player_types):
             self.num_strats.append(len(root))
             root = root[0]
-        self.verify_payoff_matrix_dimensions()
+        if num_players != 1:  # Allows for single population games
+            self.verify_payoff_matrix_dimensions()
         self.compute_dominated_strategies()
 
     def verify_payoff_matrix_dimensions(self):
@@ -73,31 +73,44 @@ class PayoffMatrix(object):
         """
         return self._iterate_through_players(player_idx, 0, {player_idx: strategy}, 1.0, current_state)
 
-    def _iterate_through_players(self, target_player_idx, current_player_idx, other_player_stategies, probability, current_state):
-        if len(other_player_stategies) == self.num_player_types:
-            strats = [0] * self.num_player_types
-            for i in range(self.num_player_types):
-                strats[i] = other_player_stategies[i]
+    def _iterate_through_players(self, target_player_idx, current_player_idx, other_player_strategies, probability, current_state):
+        if (len(other_player_strategies) == self.num_player_types and self.num_player_types != 1) or (len(other_player_strategies) == 2 and self.num_player_types == 1):
+            # Second portion accounts for single player, TODO change (2) to dependent upon matrix depth
+            if self.num_player_types == 1:
+                strats = [0] * 2  # TODO generalize based on payoff matrix depth
+            else:
+                strats = [0] * self.num_player_types
+            for i in range(len(strats)):#range(self.num_player_types):
+                strats[i] = other_player_strategies[i]
 
             payoff = self.get_payoff(target_player_idx, *strats)
+
             return payoff * probability
 
-        elif current_player_idx in other_player_stategies:
+        elif current_player_idx in other_player_strategies:
             # skip it, we already picked the strategy
-            return self._iterate_through_players(target_player_idx, current_player_idx + 1, other_player_stategies, probability, current_state)
+            return self._iterate_through_players(target_player_idx, current_player_idx + 1, other_player_strategies, probability, current_state)
         else:
-            # iterate over the current player idx dimension, recursively calling yourself on every iteration'
-            payoff = 0
+            # iterate over the current player idx dimension, recursively calling yourself on every iteration
+            if len(current_state) == 1:  # Single population game
+                payoff = 0
+                for strat in range(self.num_strats[0]):
+                    n = current_state[0][strat]
+                    p = float(n) / current_state[0].sum()
+                    dict_copy = other_player_strategies.copy()
+                    dict_copy[current_player_idx] = strat
+                    payoff += self._iterate_through_players(target_player_idx, current_player_idx + 1, dict_copy, probability * p, current_state)
+                return payoff
+            else:
+                payoff = 0
+                for strat in range(self.num_strats[current_player_idx]):
+                    n = current_state[current_player_idx][strat]
+                    p = float(n) / current_state[current_player_idx].sum()
+                    dict_copy = other_player_strategies.copy()
+                    dict_copy[current_player_idx] = strat
+                    payoff += self._iterate_through_players(target_player_idx, current_player_idx + 1, dict_copy, probability * p, current_state)
+                return payoff
 
-            for strat in range(self.num_strats[current_player_idx]):
-                n = current_state[current_player_idx][strat]
-                p = float(n) / current_state[current_player_idx].sum()
-                dict_copy = other_player_stategies.copy()
-                #dict_copy = dict(other_player_stategies.items())
-                dict_copy[current_player_idx] = strat
-                payoff += self._iterate_through_players(target_player_idx, current_player_idx + 1, dict_copy, probability * p, current_state)
-
-            return payoff
 
     def get_all_strategy_tuples(self):
         """

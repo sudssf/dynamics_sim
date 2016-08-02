@@ -248,7 +248,7 @@ class SymmetricNPlayerGame(Game):
     A convenience class that provides the logic for an N player game where each player chooses the from the same strategy
     set.
     """
-    def __init__(self, payoff_matrix, n):
+    def __init__(self, payoff_matrix, n, equilibrium_tolerance=0.1):
         """
         Initialize the symmetric game with the given payoff matrix and number of playeres
 
@@ -266,8 +266,8 @@ class SymmetricNPlayerGame(Game):
         # interpreted as multiple instances of the same player, append the transpose
         payoff_matrix_2 = tuple(map(tuple, zip(*payoff_matrix))) # transpose
         matrices = [payoff_matrix, payoff_matrix_2]
-        player_dist = (0.5, ) * n
-        super(SymmetricNPlayerGame, self).__init__(payoff_matrices=matrices, player_frequencies=player_dist)
+        player_dist = (1, )
+        super(SymmetricNPlayerGame, self).__init__(payoff_matrices=matrices, player_frequencies=player_dist, equilibrium_tolerance=equilibrium_tolerance)
 
 
 
