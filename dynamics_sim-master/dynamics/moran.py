@@ -31,7 +31,7 @@ class Moran(StochasticDynamicsSimulator):
         # make sure there are enough individuals of each type to take away 2 * num_iterations_per_time_step
         num_iterations = int(min(self.num_iterations_per_time_step * 2, minimum_total) / 2)
         
-        for p, f in zip(next_state, fitness):
+        for idx, (p, f) in enumerate(zip(next_state, fitness)):
             reproduce = numpy.zeros(len(p))
 
             for i in range(num_iterations):
@@ -47,8 +47,6 @@ class Moran(StochasticDynamicsSimulator):
                 total = p.sum()
                 dist = [n_i / float(total) for n_i in p]
                 p -= numpy.random.multinomial(1, dist)
+            next_state[idx] = p + reproduce * 2
 
-            p += reproduce * 2
-
-
-        return next_state
+        return next_state, fitness

@@ -42,5 +42,5 @@ class WrightFisher(StochasticDynamicsSimulator):
             
             state.append(new_player_state)
 
-        return state       
+        return state, fitness
 

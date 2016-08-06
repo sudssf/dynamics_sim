@@ -63,9 +63,9 @@ class DynamicsSimulator(object):
         @return: the subsequent distribution of players by player type, after the state transition
         @rtype: list
         """
-        return []
+        return [], []
 
-    def validate_state(self, s):
+    def validate_state(self, s, fitness):
         """
         Verifies validity of state, each state is an array of numpy arrays, one for every player type
         Also needs to coerce any arrays to numpy arrays
@@ -85,7 +85,7 @@ class DynamicsSimulator(object):
             assert p.sum() == expected
             assert len(p) == n_strats
 
-        return s
+        return s, fitness
 
     def simulate(self, num_gens=100, debug_state=None):
         """
@@ -104,7 +104,7 @@ class DynamicsSimulator(object):
         """
 
         if debug_state is not None:
-            state = self.validate_state(debug_state)
+            state, _ = self.validate_state(debug_state, 0)
         else:
             if not self.infinite_pop_size:
                 if self.uniDist:
@@ -123,12 +123,13 @@ class DynamicsSimulator(object):
             strategies[i][0, :] = x
 
         for gen in range(num_gens - 1):
-            state = self.validate_state(self.next_generation(state))
+            state, fitness = self.validate_state(*self.next_generation(state))
             # record state
             for i, x in enumerate(state):
                 strategies[i][gen + 1, :] = x
+                payoffs[i][gen + 1, :] = x
         
-        return strategies
+        return strategies, payoffs
 
 
     @staticmethod
@@ -190,7 +191,7 @@ class StochasticDynamicsSimulator(DynamicsSimulator):
 
     @abstractmethod
     def next_generation(self, previous):
-        return []
+        return [], []
 
     def calculate_fitnesses(self, state):
         """

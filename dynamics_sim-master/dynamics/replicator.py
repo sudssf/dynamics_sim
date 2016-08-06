@@ -39,6 +39,6 @@ class Replicator(StochasticDynamicsSimulator):
             newPlayerState = np.array(self.round_individuals(newPlayerState))
             nextState.append(newPlayerState)
 
-        return nextState
+        return nextState, fitness
         
     

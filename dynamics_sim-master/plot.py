@@ -40,7 +40,7 @@ class GraphOptions:
                PLAYER_TYPES: False}
 
 
-def plot_data_for_players(data, x_range, x_label, num_strats, num_players=None, graph_options=None):
+def plot_data_for_players(data, x_range, x_label, num_strats, num_players=None, graph_options=None, title="Proportion of Population"):
     # data is a list of n = (the number of player types) of 2D arrays
     # 1st dimension indices are the index into the x_range array
     # 2nd dimension indices are the index of the strategy number
@@ -62,7 +62,7 @@ def plot_data_for_players(data, x_range, x_label, num_strats, num_players=None, 
         old_options.update(graph_options)
     graph_options = old_options
 
-    plot_data(data, x_label, x_range, "Proportion of Population", graph_options[GraphOptions.TITLE_KEY], num_strats, graph_options=graph_options)
+    plot_data(data, x_label, x_range, title, graph_options[GraphOptions.TITLE_KEY], num_strats, graph_options=graph_options)
 
 
 def plot_single_data_set(data, x_label, x_values, y_label, title, num_categories, graph_options=None):
@@ -81,6 +81,10 @@ def _append_options(options):
 def graphLines(lineArray, plt):
     for line in lineArray:
         plt.plot([line[0], line[1]], [line[2], line[3]], 'k-', lw=1)
+
+def graphColoredLines(lineArray, plt):
+    for (line, color) in lineArray:
+        plt.plot([line[0], line[1]], [line[2], line[3]], color, lw=1)
 
 
 def stackProportions(data):  # Turns proportional data into total data

@@ -2,6 +2,7 @@ from wrapper import GameDynamicsWrapper, VariedGame
 
 from dynamics.wright_fisher import WrightFisher
 from dynamics.replicator import Replicator
+from dynamics.moran import Moran
 
 from games.coordination import Coordination
 from games.hawk_dove import HawkDove
@@ -17,8 +18,8 @@ class TestCase(unittest.TestCase):
         logging.basicConfig(filename='debug.log', level=logging.DEBUG)
 
     def test_single_simulation(self):
-        s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=.3))
-        s.simulate(num_gens=203, graph=False)#dict(area=True, shading='redBlue'))#, start_state=state)
+        s = GameDynamicsWrapper(Coordination, Moran)
+        s.simulate(num_gens=100, graph=dict(area=True), graph_payoffs=True)
 
     def test_single_population(self):
         s = GameDynamicsWrapper(HawkDove, WrightFisher, dynamics_kwargs=dict(selection_strength=0.15))
@@ -26,7 +27,7 @@ class TestCase(unittest.TestCase):
 
     def test_many_simulation(self):  # Determines which equilibria result based upon several simulations, text output
         s = GameDynamicsWrapper(CtsDisc, WrightFisher)
-        print(s.simulate_many(num_iterations=100, num_gens=100, graph=False, class_end=True))#dict(area=True, shading='redBlue')))
+        #print(s.simulate_many(num_iterations=100, num_gens=100, graph=False, class_end=True))#dict(area=True, shading='redBlue')))
 if __name__ == '__main__':
     unittest.main()
 
