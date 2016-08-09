@@ -1,11 +1,12 @@
 from plot import plot_data_for_players, GraphOptions
 
-def setupGraph(graph, game, dyn, burn, num_gens, results, payoffs):
+def setupGraph(graph, game, dyn, burn, num_gens, results, payoffs):  # TODO allow ordering of various lines
     if graph is True:
-        graph = dict()  # TODO clean up to convert from bool to dict, make into list perhaps
+        graph = dict()
     graph_options = graph
-    for key in graph_options['options']:
-        graph_options[key] = True
+    if 'options' in graph_options:
+        for key in graph_options['options']:
+            graph_options[key] = True
 
     yPos = 0
 
@@ -17,7 +18,7 @@ def setupGraph(graph, game, dyn, burn, num_gens, results, payoffs):
 
     if any(k in graph_options for k in ['payoffLine', 'modeStratLine', 'meanStratLine']):
         yPos = 0
-        graph_options['colorLineArray'] = [[] for player in payoffs]
+        graph_options['colorLineArray'] = [[] for player in results]
         graph_options['textList'] = []
 
     if 'payoffLine' in graph_options:

@@ -1,3 +1,4 @@
+from plot import plot_data_for_players, GraphOptions
 from results import NDimensionalData
 import inspect
 import numpy
@@ -120,7 +121,7 @@ class GameDynamicsWrapper(object):
             classification = game.classify(params, last_generation_state, game.equilibrium_tolerance)
             frequencies[classification] = 1
 
-        if graph:  # TODO move into another method
+        if graph:
             setupGraph(graph, game, dyn, burn, num_gens, results, payoffs)
         else:
             if return_labeled:
@@ -148,6 +149,7 @@ class GameDynamicsWrapper(object):
         @return: the frequency of time spent in each equilibria, defined by the game
         @rtype: numpy.ndarray or dict
         """
+        # TODO move this graphing into graphSetup and link it to extra options
         game = self.game_cls(**self.game_kwargs)
         dyn = self.dynamics_cls(payoff_matrix=game.pm,
                                 player_frequencies=game.player_frequencies,
@@ -174,20 +176,7 @@ class GameDynamicsWrapper(object):
                 gen *= dyn.num_players
 
         if graph:
-            if graph is True:
-                graph = dict()  #TODO clean up to convert from bool to dict
-            graph_options = graph
-            if game.STRATEGY_LABELS is not None:
-                graph_options[GraphOptions.LEGEND_LABELS_KEY] = lambda p, s: game.STRATEGY_LABELS[p][s]
-
-            if game.PLAYER_LABELS is not None:
-                graph_options[GraphOptions.TITLE_KEY] = lambda p: game.PLAYER_LABELS[p]
-
-            graph_options[GraphOptions.NO_MARKERS_KEY] = True
-
-            plot_data_for_players(stratAvg, range(burn, num_gens), "Generation #", dyn.pm.num_strats,
-                                  num_players=dyn.num_players,
-                                  graph_options=graph_options)
+            setupGraph(graph, game, dyn, burn, num_gens, stratAvg, [])  # TODO last one should be payoffs
 
         for x in equilibria:
             frequencies += x

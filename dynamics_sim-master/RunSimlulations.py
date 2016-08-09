@@ -18,15 +18,15 @@ class TestCase(unittest.TestCase):
 
     def test_single_simulation2(self):
         s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=0.3))
-        s.simulate(num_gens=190, graph=dict(shading='redBlue', options=['area', 'modeStratLine']), start_state=state)
-
-    def test_single_simulation(self):
-        s = GameDynamicsWrapper(HawkDove, WrightFisher, dynamics_kwargs=dict(selection_strength=0.2, mu=0.01))
-        #s.simulate(num_gens=5, graph=dict(area=True, payoffLine=True, modeStratLine=True, meanStratLine=True))
+        #s.simulate(num_gens=190, graph=dict(shading='redBlue', options=['area', 'modeStratLine', 'meanStratLine']), start_state=state)
 
     def test_many_simulation(self):  # Determines which equilibria result based upon several simulations, text output
-        s = GameDynamicsWrapper(CtsDisc, WrightFisher)
-        #print(s.simulate_many(num_iterations=100, num_gens=100, graph=False, class_end=True))#dict(area=True, shading='redBlue')))
+        s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=0.3))
+        s.simulate_many(num_iterations=500, num_gens=200, graph=dict(shading='redBlue', options=['area', 'modeStratLine', 'meanStratLine']), start_state=state)
+
+    def test_vary_one(self):  # Simulates while changing a single variable over time
+        s = VariedGame(HawkDove, WrightFisher, dynamics_kwargs=dict(uniDist=True))
+        #s.vary_param('lCost', (5, 0, 5), num_gens=500, num_iterations=5, graph=dict(area=True))
 if __name__ == '__main__':
     unittest.main()
 
@@ -35,9 +35,7 @@ if False:
         s = GameDynamicsWrapper(Coordination, WrightFisher)
         s.stationaryDistribution()
 
-    def test_vary_one(self):  # Simulates while changing a single variable over time
-        s = VariedGame(HawkDove, WrightFisher, dynamics_kwargs=dict(uniDist=True))
-        s.vary_param('lCost', (5, 0, 5), num_gens=500, num_iterations=5, graph=dict(area=True))
+
 
     def test_vary_one2(self):  # Simulates while changing a single variable over time
         s = VariedGame(HawkDove, WrightFisher, dynamics_kwargs=dict(uniDist=True))
