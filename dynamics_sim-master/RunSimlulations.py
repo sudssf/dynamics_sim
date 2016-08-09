@@ -18,7 +18,8 @@ class TestCase(unittest.TestCase):
 
     def test_single_simulation2(self):
         s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=0.3))
-        s.simulate(num_gens=190, graph=dict(area=True, shading='redBlue', payoffLine=True, modeStratLine=True, meanStratLine=True), start_state=state)
+        s.simulate(num_gens=190, graph=dict(shading='redBlue', options=['area', 'modeStratLine']), start_state=state)
+
     def test_single_simulation(self):
         s = GameDynamicsWrapper(HawkDove, WrightFisher, dynamics_kwargs=dict(selection_strength=0.2, mu=0.01))
         #s.simulate(num_gens=5, graph=dict(area=True, payoffLine=True, modeStratLine=True, meanStratLine=True))

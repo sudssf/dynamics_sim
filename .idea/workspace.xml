@@ -2,15 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d1a61c42-7ea7-4d98-bd1e-150aecf5c1db" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dynamics_sim-master/plotHelperFunct.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dynamics_sim-master/graphSetup.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/RunSimlulations.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/RunSimlulations.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/dynamics/dynamics.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/dynamics/dynamics.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/dynamics/wright_fisher.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/dynamics/wright_fisher.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/games/cts_disc.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/games/cts_disc.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/games/fashion_signaling.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/games/fashion_signaling.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/games/payoff_matrices/fashion_signaling_matrices.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/games/payoff_matrices/fashion_signaling_matrices.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/plot.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/plot.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/wrapper.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/wrapper.py" />
     </list>
     <ignored path="DyPy.iws" />
@@ -31,11 +25,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="RunSimlulations.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="RunSimlulations.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dynamics_sim-master/RunSimlulations.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="220">
-              <caret line="20" column="9" selection-start-line="20" selection-start-column="9" selection-end-line="20" selection-end-column="9" />
+              <caret line="20" column="96" selection-start-line="20" selection-start-column="96" selection-end-line="20" selection-end-column="96" />
               <folding>
                 <element signature="e#0#51#0" expanded="true" />
               </folding>
@@ -55,21 +49,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="plotHelperFunct.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dynamics_sim-master/plotHelperFunct.py">
+      <file leaf-file-name="wrapper.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/dynamics_sim-master/wrapper.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="15" column="40" selection-start-line="15" selection-start-column="40" selection-end-line="15" selection-end-column="40" />
-              <folding />
+            <state relative-caret-position="286">
+              <caret line="123" column="40" selection-start-line="123" selection-start-column="40" selection-end-line="123" selection-end-column="40" />
+              <folding>
+                <element signature="e#0#36#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="wrapper.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dynamics_sim-master/wrapper.py">
+      <file leaf-file-name="graphSetup.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dynamics_sim-master/graphSetup.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-12">
-              <caret line="138" column="46" selection-start-line="138" selection-start-column="46" selection-end-line="138" selection-end-column="46" />
+            <state relative-caret-position="44">
+              <caret line="2" column="33" selection-start-line="2" selection-start-column="33" selection-end-line="2" selection-end-column="33" />
               <folding />
             </state>
           </provider>
@@ -97,10 +93,12 @@
         <option value="$PROJECT_DIR$/dynamics_sim-master/games/payoff_matrices/fashion_signaling_matrices.py" />
         <option value="$PROJECT_DIR$/dynamics_sim-master/dynamics/dynamics.py" />
         <option value="$PROJECT_DIR$/dynamics_sim-master/dynamics/wright_fisher.py" />
-        <option value="$PROJECT_DIR$/dynamics_sim-master/wrapper.py" />
         <option value="$PROJECT_DIR$/dynamics_sim-master/plot.py" />
         <option value="$PROJECT_DIR$/dynamics_sim-master/plotHelperFunct.py" />
         <option value="$PROJECT_DIR$/dynamics_sim-master/RunSimlulations.py" />
+        <option value="$PROJECT_DIR$/dynamics_sim-master/graphOptions.py" />
+        <option value="$PROJECT_DIR$/dynamics_sim-master/graphSetup.py" />
+        <option value="$PROJECT_DIR$/dynamics_sim-master/wrapper.py" />
       </list>
     </option>
   </component>
@@ -136,7 +134,38 @@
     </navigator>
     <panes>
       <pane id="ProjectPane">
-        <subPane />
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DyPy" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DyPy" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DyPy" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DyPy" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="DyPy" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dynamics_sim-master" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
       </pane>
       <pane id="Scratches" />
       <pane id="Scope" />
@@ -328,14 +357,21 @@
       <option name="project" value="LOCAL" />
       <updated>1470455518966</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="added three graphing options:&#10;&#10;Graph maximum payoff line&#10;Graph most common strategy&#10;Graph average strategy">
+      <created>1470778230102</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1470778230102</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34955052" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34955052" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3295583" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -367,7 +403,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Graph payoffs option added to simulate" />
-    <option name="LAST_COMMIT_MESSAGE" value="Graph payoffs option added to simulate" />
+    <MESSAGE value="added three graphing options:&#10;&#10;Graph maximum payoff line&#10;Graph most common strategy&#10;Graph average strategy" />
+    <option name="LAST_COMMIT_MESSAGE" value="added three graphing options:&#10;&#10;Graph maximum payoff line&#10;Graph most common strategy&#10;Graph average strategy" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -391,7 +428,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#27#0" expanded="true" />
+            <element signature="e#0#27#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -401,7 +438,7 @@
         <state relative-caret-position="154">
           <caret line="9" column="39" selection-start-line="9" selection-start-column="39" selection-end-line="9" selection-end-column="39" />
           <folding>
-            <element signature="e#0#49#0" expanded="true" />
+            <element signature="e#0#49#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -421,7 +458,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#27#0" expanded="true" />
+            <element signature="e#0#27#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -431,7 +468,7 @@
         <state relative-caret-position="154">
           <caret line="9" column="39" selection-start-line="9" selection-start-column="39" selection-end-line="9" selection-end-column="39" />
           <folding>
-            <element signature="e#0#49#0" expanded="true" />
+            <element signature="e#0#49#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -660,7 +697,7 @@
         <state relative-caret-position="-66">
           <caret line="12" column="52" selection-start-line="12" selection-start-column="52" selection-end-line="12" selection-end-column="52" />
           <folding>
-            <element signature="e#0#27#0" expanded="true" />
+            <element signature="e#0#27#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -670,7 +707,7 @@
         <state relative-caret-position="154">
           <caret line="9" column="39" selection-start-line="9" selection-start-column="39" selection-end-line="9" selection-end-column="39" />
           <folding>
-            <element signature="e#0#49#0" expanded="true" />
+            <element signature="e#0#49#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -691,10 +728,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dynamics_sim-master/wrapper.py">
+    <entry file="file://$PROJECT_DIR$/dynamics_sim-master/plotHelperFunct.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-12">
-          <caret line="138" column="46" selection-start-line="138" selection-start-column="46" selection-end-line="138" selection-end-column="46" />
+        <state relative-caret-position="220">
+          <caret line="15" column="40" selection-start-line="15" selection-start-column="40" selection-end-line="15" selection-end-column="40" />
           <folding />
         </state>
       </provider>
@@ -709,20 +746,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dynamics_sim-master/plotHelperFunct.py">
+    <entry file="file://$PROJECT_DIR$/dynamics_sim-master/RunSimlulations.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="220">
-          <caret line="15" column="40" selection-start-line="15" selection-start-column="40" selection-end-line="15" selection-end-column="40" />
+          <caret line="20" column="96" selection-start-line="20" selection-start-column="96" selection-end-line="20" selection-end-column="96" />
+          <folding>
+            <element signature="e#0#51#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dynamics_sim-master/graphSetup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="44">
+          <caret line="2" column="33" selection-start-line="2" selection-start-column="33" selection-end-line="2" selection-end-column="33" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dynamics_sim-master/RunSimlulations.py">
+    <entry file="file://$PROJECT_DIR$/dynamics_sim-master/wrapper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="20" column="9" selection-start-line="20" selection-start-column="9" selection-end-line="20" selection-end-column="9" />
+        <state relative-caret-position="286">
+          <caret line="123" column="40" selection-start-line="123" selection-start-column="40" selection-end-line="123" selection-end-column="40" />
           <folding>
-            <element signature="e#0#51#0" expanded="true" />
+            <element signature="e#0#36#0" expanded="true" />
           </folding>
         </state>
       </provider>
