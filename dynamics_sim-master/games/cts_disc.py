@@ -7,7 +7,7 @@ m = n + 1
 stratOptions = ['Punish iff S > ' + str(value) + '/' + str(n) for value in range(0, m)]
 
 class CtsDisc(SymmetricNPlayerGame):
-    DEFAULT_PARAMS = dict(a=4, b=0, c=2, d=4, errorRange=1/5)
+    DEFAULT_PARAMS = dict(a=4, b=2, c=0, d=4, errorRange=1/5)
     PLAYER_LABELS = ['Judge']
     STRATEGY_LABELS = (["Always Punish"] + stratOptions + ["Never Punish"])
     EQUILIBRIA_LABELS = ('Always punish', 'Never Punish', 'Coordinate on punishment')

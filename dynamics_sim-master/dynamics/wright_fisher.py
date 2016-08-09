@@ -14,7 +14,6 @@ class WrightFisher(StochasticDynamicsSimulator):
 
         fitness = self.calculate_fitnesses(previous_state)
 
-
         # Generate offspring population probabilistically based on
         # fitness/avg_fitness, with some potential for each individual to be mutated
         for player_idx, (strategy_distribution, fitnesses, num_players) in enumerate(zip(previous_state, fitness, self.num_players)):

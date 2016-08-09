@@ -1,29 +1,27 @@
 from wrapper import GameDynamicsWrapper, VariedGame
 
 from dynamics.wright_fisher import WrightFisher
-from dynamics.replicator import Replicator
-from dynamics.moran import Moran
 
 from games.coordination import Coordination
 from games.hawk_dove import HawkDove
 from games.cts_disc import CtsDisc
+from games.fashion_signaling import FashionSignaling
 
 import unittest
 
-state = [(0, 0, 0, 0, 0, 0, 0, 0, 100, 0)]
+state = [(0, 0, 0, 0, 0, 0, 0, 100, 0, 0)]
 
 class TestCase(unittest.TestCase):
     def setUp(self):
         import logging
         logging.basicConfig(filename='debug.log', level=logging.DEBUG)
 
+    def test_single_simulation2(self):
+        s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=0.3))
+        s.simulate(num_gens=190, graph=dict(area=True, shading='redBlue', payoffLine=True, modeStratLine=True, meanStratLine=True), start_state=state)
     def test_single_simulation(self):
-        s = GameDynamicsWrapper(Coordination, Moran)
-        s.simulate(num_gens=100, graph=dict(area=True), graph_payoffs=True)
-
-    def test_single_population(self):
-        s = GameDynamicsWrapper(HawkDove, WrightFisher, dynamics_kwargs=dict(selection_strength=0.15))
-        #s.simulate(num_gens=2000, graph=dict(area=True))
+        s = GameDynamicsWrapper(HawkDove, WrightFisher, dynamics_kwargs=dict(selection_strength=0.2, mu=0.01))
+        #s.simulate(num_gens=5, graph=dict(area=True, payoffLine=True, modeStratLine=True, meanStratLine=True))
 
     def test_many_simulation(self):  # Determines which equilibria result based upon several simulations, text output
         s = GameDynamicsWrapper(CtsDisc, WrightFisher)
@@ -33,7 +31,7 @@ if __name__ == '__main__':
 
 if False:
     def calculate_stationary(self):
-        s = GameDynamicsWrapper(Coordination, Moran)
+        s = GameDynamicsWrapper(Coordination, WrightFisher)
         s.stationaryDistribution()
 
     def test_vary_one(self):  # Simulates while changing a single variable over time

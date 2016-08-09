@@ -60,8 +60,7 @@ class GameDynamicsWrapper(object):
     def stationaryDistribution(self):
         pass
 
-    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=True, burn=0, return_labeled=True, start_state=None, class_end=False,
-                 graph_payoffs=False, graph_payoff_line=False):
+    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=True, burn=0, return_labeled=True, start_state=None, class_end=False):
         """
         Simulate the game for the given number of generations with the specified dynamics class and optionally graph the results
 
@@ -74,14 +73,20 @@ class GameDynamicsWrapper(object):
         @type return_labeled: bool
         @param start_state: whether the starting state is to be predeterined
         @type start_state: list
+        @param graph_payoffs: to graph the payoffs for each generation
+        @type graph_payoffs: bool
+        @param graph_payoff_line: to show the dominate strategy for each generation of the game underneath the graph
+        @type graph_payoff_line: bool
         @return: the frequency of time spent in each equilibria, defined by the game
         @rtype: numpy.ndarray or dict
         """
+        global yPos
         game = self.game_cls(**self.game_kwargs)
         dyn = self.dynamics_cls(payoff_matrix=game.pm,
                                 player_frequencies=game.player_frequencies,
                                 **self.dynamics_kwargs)
         results, payoffs = dyn.simulate(num_gens=num_gens, debug_state=start_state)
+
         # results_obj = SingleSimulationOutcome(self.dynamics_cls, self.dynamics_kwargs, self.game_cls, self.game_kwargs, results)
         # TODO: serialize results to file
         params = Obj(**self.game_kwargs)
@@ -117,9 +122,9 @@ class GameDynamicsWrapper(object):
             classification = game.classify(params, last_generation_state, game.equilibrium_tolerance)
             frequencies[classification] = 1
 
-        if graph:
+        if graph:  # TODO move into another method
             if graph is True:
-                graph = dict()  #TODO clean up to convert from bool to dict
+                graph = dict()  # TODO clean up to convert from bool to dict, make into list perhaps
             graph_options = graph
 
             if game.STRATEGY_LABELS is not None:
@@ -128,13 +133,64 @@ class GameDynamicsWrapper(object):
             if game.PLAYER_LABELS is not None:
                 graph_options[GraphOptions.TITLE_KEY] = lambda p: game.PLAYER_LABELS[p]
 
+            if any(k in graph_options for k in ['payoffLine', 'modeStratLine', 'meanStratLine']):
+                yPos = 0
+                graph_options['colorLineArray'] = [[] for player in payoffs]
+                graph_options['textList'] = []
+
+            if 'payoffLine' in graph_options:
+                yPos -= 0.05
+                for playerIdx, player in enumerate(payoffs):
+                    colorLineArray = []
+                    for gen in range(burn, num_gens-1):
+                        maxPayoff = 0
+                        maxPayoffIdx = -1
+                        for payoffIdx, payoff in enumerate(player[gen]):
+                            if payoff > maxPayoff:
+                                maxPayoff = payoff
+                                maxPayoffIdx = payoffIdx
+
+                        currentGen = gen - burn
+                        nextGen = gen - burn + 1
+
+                        line = [currentGen, nextGen, yPos, yPos]
+                        colorLineArray.append([line, maxPayoffIdx])
+                    #colorLineArray[0][1] = colorLineArray[1][1]  # To fill in first gen
+                    graph_options['colorLineArray'][playerIdx].extend(colorLineArray)
+                    graph_options['textList'].append(([-num_gens/10, yPos], 'Greatest payoff'))  # TODO fix x positioning
+
+            if 'modeStratLine' in graph_options:
+                yPos -= 0.05
+                for playerIdx, player in enumerate(results):
+                    colorLineArray = []
+                    for gen in range(burn, num_gens):
+                        maxStratProp = 0
+                        maxStratIdx = -1
+                        for stratIdx, stratProp in enumerate(player[gen]):
+                            if stratProp > maxStratProp:
+                                maxStratProp = stratProp
+                                maxStratIdx = stratIdx
+
+                        currentGen = gen - burn
+                        nextGen = gen - burn + 1
+                        line = [currentGen, nextGen, yPos, yPos]
+                        colorLineArray.append([line, maxStratIdx])
+                    graph_options['colorLineArray'][playerIdx].extend(colorLineArray)
+                    graph_options['textList'].append(([-num_gens/10, yPos], 'Popular strategy'))
+
+            if 'meanStratLine' in graph_options:
+                yPos -= 0.05
+                graph_options['textList'].append(([-num_gens / 10, yPos], 'Average strategy'))
+
+            yPos -= 0.025  # TODO FIX mme
+
             graph_options[GraphOptions.NO_MARKERS_KEY] = True
 
             plot_data_for_players(results, range(burn, num_gens), "Generation #", dyn.pm.num_strats,
                                   num_players=dyn.num_players,
-                                  graph_options=graph_options)
+                                  graph_options=graph_options, yBot=yPos)
 
-            if graph_payoffs:
+            if 'graph_payoffs' in graph_options:
                 if burn == 0:
                     burn = 1
                 plot_data_for_players(payoffs, range(burn, num_gens), "Generation #", dyn.pm.num_strats,

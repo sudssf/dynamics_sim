@@ -1,21 +1,17 @@
-__author__ = 'elubin'
-
 import matplotlib.pyplot as plt
 import numpy
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import math
-
-blueShades = [(0, 0, 0), (25, 25, 112), (0, 0, 128), (0, 0, 205), (0, 0, 225), (30, 144, 255), (0, 191, 255),
-              (135, 206, 250), (173, 216, 230), (200, 255, 255), (255, 255, 255)]
+import copy
+from plotHelperFunct import *
 
 redBlueShades = [(229, 0, 15), (206, 3, 32), (183, 7, 50), (160, 11, 67), (137, 15, 85), (114, 19, 103), (91, 22, 120),
                  (68, 26, 138), (45, 30, 155), (22, 34, 173)]
 
 class GraphOptions:
     COLORS_KEY = 'colors'
-    BLUE_COLORS_KEY = 'Blue gradient'
     RED_TO_BLUE_COLORS_KEY = 'Red to Blue gradient'
     EXTRA_COLORS = 'extra colors if more than 7 to be shown'
     Y_LABEL_KEY = 'y_label'
@@ -28,7 +24,6 @@ class GraphOptions:
     PLAYER_TYPES = 'Group certain graphs'
 
     default = {COLORS_KEY: ['Cyan', 'Blue', 'Green', 'Yellow', 'Red', 'Magenta', 'Black', 'BlueViolet', 'Crimson', 'Indigo'] * 5,  # If extra colors needed it repeats
-               BLUE_COLORS_KEY: [(value[0]/255, value[1]/255, value[2]/255) for value in blueShades],
                RED_TO_BLUE_COLORS_KEY: [(value[0]/255, value[1]/255, value[2]/255) for value in redBlueShades],
                MARKERS_KEY: "o.v8sh+xD|_ ",
                NO_MARKERS_KEY: False,
@@ -40,7 +35,7 @@ class GraphOptions:
                PLAYER_TYPES: False}
 
 
-def plot_data_for_players(data, x_range, x_label, num_strats, num_players=None, graph_options=None, title="Proportion of Population"):
+def plot_data_for_players(data, x_range, x_label, num_strats, num_players=None, graph_options=None, title="Proportion of Population", yBot=None):
     # data is a list of n = (the number of player types) of 2D arrays
     # 1st dimension indices are the index into the x_range array
     # 2nd dimension indices are the index of the strategy number
@@ -62,7 +57,7 @@ def plot_data_for_players(data, x_range, x_label, num_strats, num_players=None, 
         old_options.update(graph_options)
     graph_options = old_options
 
-    plot_data(data, x_label, x_range, title, graph_options[GraphOptions.TITLE_KEY], num_strats, graph_options=graph_options)
+    plot_data(data, x_label, x_range, title, graph_options[GraphOptions.TITLE_KEY], num_strats, graph_options=graph_options, yBot=yBot)
 
 
 def plot_single_data_set(data, x_label, x_values, y_label, title, num_categories, graph_options=None):
@@ -77,30 +72,8 @@ def _append_options(options):
         old_options.update(options)
     return old_options
 
-
-def graphLines(lineArray, plt):
-    for line in lineArray:
-        plt.plot([line[0], line[1]], [line[2], line[3]], 'k-', lw=1)
-
-def graphColoredLines(lineArray, plt):
-    for (line, color) in lineArray:
-        plt.plot([line[0], line[1]], [line[2], line[3]], color, lw=1)
-
-
-def stackProportions(data):  # Turns proportional data into total data
-    for generation in data:
-        for i, cat in enumerate(generation):
-            if not i == 0:
-                generation[i] += generation[i-1] 
-
-
-def normalize(value_range, normalizeTo=1):  # Normalizes data to 1, useful for type proportions
-    for i, step in enumerate(value_range):
-        value_range[i] = step / (step + normalizeTo)
-    return value_range
-
     
-def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_options=None):
+def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_options=None, yBot=None):
     """
     support for multiple 2d arrays, each as an entry in the data array
     All data should be normalized before being passed in
@@ -128,7 +101,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
         lightShading = [value / (different * 3) for value in range(different)]
 
         if color == 'blue':
-            colors = [(0, 0, value) for idx, value in enumerate(shading)]
+            colors = [(lightShading[idx], lightShading[idx], value) for idx, value in enumerate(shading)]
         elif color == 'green':
             colors = [(lightShading[idx], value, lightShading[idx]) for idx, value in enumerate(shading)]
         elif color == 'red':
@@ -149,6 +122,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
     else:
         # graph the results
         for i, data_i in enumerate(data):
+            rawData = copy.deepcopy(data_i)
             plt.figure(i)
             plt.title(title_i(i))
             
@@ -160,9 +134,13 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
     
             # iterate over all the generations
             num_xs, n_cats = data_i.shape
-    
+
+            if yBot is None:
+                plt.ylim([-0.01, 1.01])
+            else:
+                plt.ylim([yBot, 1.01])
+
             plt.xlim([x_values[0], x_values[-1]])
-            plt.ylim([-0.01, 1.01])
             plt.ylabel(y_label)
             plt.xlabel(x_label)
             plt.grid(graph_options[GraphOptions.SHOW_GRID_KEY])
@@ -184,9 +162,18 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
                 
             labels = [category_labels(i, j) for j in range(n_cats)]
             plt.legend(labels, loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY])
-            
+
             if 'lineArray' in graph_options:
                 graphLines(graph_options['lineArray'], plt)
+            if 'meanStratLine' in graph_options:
+                for genNumber, gen in enumerate(rawData):
+                    avgColor = colorAvg(colors, gen)
+                    line = [genNumber, genNumber + 1, yBot + 0.025, yBot + 0.025]
+                    graph_options['colorLineArray'][i].append([line, avgColor])
+            if 'colorLineArray' in graph_options:
+                graphColoredLines(graph_options['colorLineArray'][i], plt, colors)
+            if 'textList' in graph_options:
+                plotText(graph_options['textList'], plt)
 
     plt.show()
     

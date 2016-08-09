@@ -124,11 +124,13 @@ class DynamicsSimulator(object):
 
         for gen in range(num_gens - 1):
             state, fitness = self.validate_state(*self.next_generation(state))
+
             # record state
             for i, x in enumerate(state):
                 strategies[i][gen + 1, :] = x
+            for i, x in enumerate(fitness):
                 payoffs[i][gen + 1, :] = x
-        
+
         return strategies, payoffs
 
 
