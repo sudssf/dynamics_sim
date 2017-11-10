@@ -127,7 +127,7 @@ class GameDynamicsWrapper(object):
             if return_labeled:
                 return self._convert_equilibria_frequencies(frequencies)
             else:
-                return frequencies, results
+                return frequencies, results, payoffs
 
 
     def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, return_labeled=True, burn=0, parallelize=True, graph=False, start_state=None, class_end=False):
@@ -159,9 +159,11 @@ class GameDynamicsWrapper(object):
 
         equilibria = []
         strategies = [0]*num_iterations
+        payoffs = [0]*num_iterations
         for idx, sim in enumerate(output):
             equilibria.append(sim[0])
             strategies[idx] = sim[1]
+            payoffs[idx] = sim[2]
 
         stratAvg = [numpy.zeros(shape=(num_gens, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
         for iteration in range(num_iterations):
@@ -175,8 +177,20 @@ class GameDynamicsWrapper(object):
                 gen /= gen.sum()
                 gen *= dyn.num_players
 
+        payoffsAvg = [numpy.zeros(shape=(num_gens - 1, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
+        for iteration in range(num_iterations):
+            for player in range(dyn.pm.num_player_types):
+                for gen in range(num_gens - 1):
+                    for strat in range(dyn.pm.num_strats[player]):
+                        payoffsAvg[player][gen][strat] += payoffs[iteration][player][gen][strat]
+
+        for playerIdx, player in enumerate(payoffsAvg):
+            for genIdx, gen in enumerate(player):
+                gen /= gen.sum()
+                gen *= dyn.num_players
+
         if graph:
-            setupGraph(graph, game, dyn, burn, num_gens, stratAvg, [])  # TODO last one should be payoffs
+            setupGraph(graph, game, dyn, burn, num_gens, stratAvg, payoffs[0])
 
         for x in equilibria:
             frequencies += x

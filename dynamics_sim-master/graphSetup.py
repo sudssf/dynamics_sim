@@ -5,8 +5,10 @@ def setupGraph(graph, game, dyn, burn, num_gens, results, payoffs):  # TODO allo
         graph = dict()
     graph_options = graph
     if 'options' in graph_options:
+        order = 1
         for key in graph_options['options']:
             graph_options[key] = True
+
 
     yPos = 0
 

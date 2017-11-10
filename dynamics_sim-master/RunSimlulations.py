@@ -4,29 +4,30 @@ from dynamics.wright_fisher import WrightFisher
 
 from games.coordination import Coordination
 from games.hawk_dove import HawkDove
-from games.cts_disc import CtsDisc
 from games.fashion_signaling import FashionSignaling
+from games.cts_disc import CtsDisc
 
 import unittest
 
-state = [(0, 0, 0, 0, 0, 0, 0, 100, 0, 0)]
+state = [(0, 0, 100, 0, 0, 0, 0, 0, 0, 0)]
 
 class TestCase(unittest.TestCase):
     def setUp(self):
         import logging
         logging.basicConfig(filename='debug.log', level=logging.DEBUG)
 
-    def test_single_simulation2(self):
+    def test_single_simulation(self):
         s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=0.3))
-        #s.simulate(num_gens=190, graph=dict(shading='redBlue', options=['area', 'modeStratLine', 'meanStratLine']), start_state=state)
+        s.simulate(num_gens=190, graph=dict(shading='redblue', options=['area', 'meanStratLine', 'payoffLine']), start_state=state)
+
+    def test_vary_one(self):  # Simulates while changing a single variable over time
+        s = VariedGame(Coordination, WrightFisher, dynamics_kwargs=dict(uniDist=True))
+        #s.vary_param('a', (0, 100, 5), num_gens=500, num_iterations=5, graph=dict(options=['area']))
 
     def test_many_simulation(self):  # Determines which equilibria result based upon several simulations, text output
         s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=0.3))
-        s.simulate_many(num_iterations=500, num_gens=200, graph=dict(shading='redBlue', options=['area', 'modeStratLine', 'meanStratLine']), start_state=state)
+        #print(s.simulate_many(num_iterations=100, num_gens=190, graph=dict(shading='redblue', options=['area', 'nolegend', 'meanStratLine', 'payoffLine']), start_state=state))
 
-    def test_vary_one(self):  # Simulates while changing a single variable over time
-        s = VariedGame(HawkDove, WrightFisher, dynamics_kwargs=dict(uniDist=True))
-        #s.vary_param('lCost', (5, 0, 5), num_gens=500, num_iterations=5, graph=dict(area=True))
 if __name__ == '__main__':
     unittest.main()
 
@@ -34,8 +35,6 @@ if False:
     def calculate_stationary(self):
         s = GameDynamicsWrapper(Coordination, WrightFisher)
         s.stationaryDistribution()
-
-
 
     def test_vary_one2(self):  # Simulates while changing a single variable over time
         s = VariedGame(HawkDove, WrightFisher, dynamics_kwargs=dict(uniDist=True))

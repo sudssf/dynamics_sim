@@ -87,6 +87,14 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
 
     graph_options = _append_options(graph_options)
 
+    fontsize = 30
+
+    if 'smallfont' in graph_options:
+        fontsize = 18
+
+    if 'largefont' in graph_options:
+        fontsize = 36
+
     #Determine coloration
     if 'shading' in graph_options:
         shading = graph_options['shading'].lower()
@@ -141,8 +149,10 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
                 plt.ylim([yBot, 1.01])
 
             plt.xlim([x_values[0], x_values[-1]])
-            plt.ylabel(y_label)
-            plt.xlabel(x_label)
+
+            plt.ylabel(y_label, fontsize=fontsize, fontweight='bold')
+            plt.xlabel(x_label, fontsize=fontsize, fontweight='bold')
+            plt.tick_params(axis='both', which='major', labelsize=fontsize)
             plt.grid(graph_options[GraphOptions.SHOW_GRID_KEY])
 
             # iterate over all the categories
@@ -161,7 +171,10 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
                 plt.plot(x_values, data_i[:, cat_i], c=colors[cat_i % n_cats], lw=2, marker=marker)
                 
             labels = [category_labels(i, j) for j in range(n_cats)]
-            plt.legend(labels, loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY])
+
+            legend = plt.legend(labels, loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY], fontsize=fontsize)
+            if 'nolegend' in graph_options:
+                legend.remove()
 
             if 'lineArray' in graph_options:
                 graphLines(graph_options['lineArray'], plt)
