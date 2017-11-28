@@ -3,11 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d1a61c42-7ea7-4d98-bd1e-150aecf5c1db" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/RunSimlulations.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/RunSimlulations.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/games/cts_disc.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/games/cts_disc.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/graphSetup.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/graphSetup.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/plot.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/plot.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dynamics_sim-master/plotHelperFunct.py" afterPath="$PROJECT_DIR$/dynamics_sim-master/plotHelperFunct.py" />
     </list>
     <ignored path="DyPy.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -371,7 +366,14 @@
       <option name="project" value="LOCAL" />
       <updated>1510345622178</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Added font options and noLegend option">
+      <created>1511900971601</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1511900971601</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
