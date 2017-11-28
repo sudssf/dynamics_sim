@@ -36,6 +36,6 @@ def normalize(value_range, normalizeTo=1):  # Normalizes data to 1, useful for t
         value_range[i] = step / (step + normalizeTo)
     return value_range
 
-def plotText(textList, plt):
+def plotText(textList, plt, fontsize):
     for position, text in textList:
-        plt.text(*position, text)
+        plt.text(*position, text, fontsize=fontsize)

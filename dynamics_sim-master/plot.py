@@ -78,6 +78,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
     support for multiple 2d arrays, each as an entry in the data array
     All data should be normalized before being passed in
     """
+    global colors
 
     n_x = len(x_values)
     for state_i, n_cats in zip(data, num_categories):
@@ -88,11 +89,9 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
     graph_options = _append_options(graph_options)
 
     fontsize = 30
-
-    if 'smallfont' in graph_options:
+    if 'smallFont' in graph_options:
         fontsize = 18
-
-    if 'largefont' in graph_options:
+    elif 'largeFont' in graph_options:
         fontsize = 36
 
     #Determine coloration
@@ -143,6 +142,19 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
             # iterate over all the generations
             num_xs, n_cats = data_i.shape
 
+            if n_cats > len(colors):
+                factor = int(n_cats / len(colors)) + 1
+
+                newColors = []
+                for idx, color in enumerate(colors):
+                    if idx != len(colors) - 1:
+                        for i in range(factor):
+                            newColors.append(colorAvg([colors[idx], colors[idx+1]], [(factor - i) / factor, i/ factor]))
+
+                newColors.append(colors[-1])
+
+                colors = newColors
+
             if yBot is None:
                 plt.ylim([-0.01, 1.01])
             else:
@@ -173,7 +185,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
             labels = [category_labels(i, j) for j in range(n_cats)]
 
             legend = plt.legend(labels, loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY], fontsize=fontsize)
-            if 'nolegend' in graph_options:
+            if 'nolegend' in graph_options or 'noLegend' in graph_options:
                 legend.remove()
 
             if 'lineArray' in graph_options:
@@ -186,7 +198,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
             if 'colorLineArray' in graph_options:
                 graphColoredLines(graph_options['colorLineArray'][i], plt, colors)
             if 'textList' in graph_options:
-                plotText(graph_options['textList'], plt)
+                plotText(graph_options['textList'], plt, fontsize=fontsize)
 
     plt.show()
     

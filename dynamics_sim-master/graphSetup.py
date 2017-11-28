@@ -42,7 +42,7 @@ def setupGraph(graph, game, dyn, burn, num_gens, results, payoffs):  # TODO allo
                 colorLineArray.append([line, maxPayoffIdx])
             # colorLineArray[0][1] = colorLineArray[1][1]  # To fill in first gen
             graph_options['colorLineArray'][playerIdx].extend(colorLineArray)
-            graph_options['textList'].append(([-num_gens / 10, yPos], 'Greatest payoff'))  # TODO fix x positioning
+            #graph_options['textList'].append(([-num_gens / 7, yPos], 'Best Strat'))  # TODO fix x positioning
 
     if 'modeStratLine' in graph_options:
         yPos -= 0.05
@@ -61,11 +61,11 @@ def setupGraph(graph, game, dyn, burn, num_gens, results, payoffs):  # TODO allo
                 line = [currentGen, nextGen, yPos, yPos]
                 colorLineArray.append([line, maxStratIdx])
             graph_options['colorLineArray'][playerIdx].extend(colorLineArray)
-            graph_options['textList'].append(([-num_gens / 10, yPos], 'Modal strategy'))
+            #graph_options['textList'].append(([-num_gens / 7, yPos], 'Modal Strat'))
 
     if 'meanStratLine' in graph_options:
         yPos -= 0.05
-        graph_options['textList'].append(([-num_gens / 10, yPos], 'Average strategy'))
+        #graph_options['textList'].append(([-num_gens / 7, yPos], 'Mean Strat'))
 
     yPos -= 0.025
 

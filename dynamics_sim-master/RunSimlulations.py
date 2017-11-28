@@ -9,7 +9,8 @@ from games.cts_disc import CtsDisc
 
 import unittest
 
-state = [(0, 0, 100, 0, 0, 0, 0, 0, 0, 0)]
+state = [[0 for i in range(10)]]
+state[0][2] += 100
 
 class TestCase(unittest.TestCase):
     def setUp(self):
@@ -17,8 +18,8 @@ class TestCase(unittest.TestCase):
         logging.basicConfig(filename='debug.log', level=logging.DEBUG)
 
     def test_single_simulation(self):
-        s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=0.3))
-        s.simulate(num_gens=190, graph=dict(shading='redblue', options=['area', 'meanStratLine', 'payoffLine']), start_state=state)
+        s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=.3))
+        s.simulate(num_gens=190, graph=dict(shading='redblue', options=['area', 'meanStratLine', 'payoffLine', 'largeFont', 'noLegend']), start_state=state)
 
     def test_vary_one(self):  # Simulates while changing a single variable over time
         s = VariedGame(Coordination, WrightFisher, dynamics_kwargs=dict(uniDist=True))
@@ -26,7 +27,7 @@ class TestCase(unittest.TestCase):
 
     def test_many_simulation(self):  # Determines which equilibria result based upon several simulations, text output
         s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=0.3))
-        #print(s.simulate_many(num_iterations=100, num_gens=190, graph=dict(shading='redblue', options=['area', 'nolegend', 'meanStratLine', 'payoffLine']), start_state=state))
+        #print(s.simulate_many(num_iterations=100, num_gens=190, graph=dict(shading='redblue', options=['area', 'noLegend', 'largeFont']), start_state=state))
 
 if __name__ == '__main__':
     unittest.main()
