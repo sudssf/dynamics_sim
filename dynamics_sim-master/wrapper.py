@@ -165,29 +165,32 @@ class GameDynamicsWrapper(object):
             strategies[idx] = sim[1]
             payoffs[idx] = sim[2]
 
+        #TODO move these averages or only compile them if appropriate simulation type
         stratAvg = [numpy.zeros(shape=(num_gens, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
         for iteration in range(num_iterations):
             for player in range(dyn.pm.num_player_types):
-                for gen in range(num_gens):
+                for gen in range(num_gens - burn):
                     for strat in range(dyn.pm.num_strats[player]):
                         stratAvg[player][gen][strat] += strategies[iteration][player][gen][strat]
 
         for playerIdx, player in enumerate(stratAvg):
             for genIdx, gen in enumerate(player):
-                gen /= gen.sum()
-                gen *= dyn.num_players
+                if gen.sum() != 0:
+                    gen /= gen.sum()
+                    gen *= dyn.num_players
 
         payoffsAvg = [numpy.zeros(shape=(num_gens - 1, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
         for iteration in range(num_iterations):
             for player in range(dyn.pm.num_player_types):
-                for gen in range(num_gens - 1):
+                for gen in range(num_gens - 1 - burn):
                     for strat in range(dyn.pm.num_strats[player]):
                         payoffsAvg[player][gen][strat] += payoffs[iteration][player][gen][strat]
 
         for playerIdx, player in enumerate(payoffsAvg):
             for genIdx, gen in enumerate(player):
-                gen /= gen.sum()
-                gen *= dyn.num_players
+                if gen.sum() != 0:
+                    gen /= gen.sum()
+                    gen *= dyn.num_players
 
         if graph:
             setupGraph(graph, game, dyn, burn, num_gens, stratAvg, payoffs[0])

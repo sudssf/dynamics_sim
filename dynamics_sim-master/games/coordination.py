@@ -16,11 +16,11 @@ class Coordination(Game):
 
         payoff_matrix = [payoff_matrix_1, payoff_matrix_2]
         player_dist = (1/2, 1/2)
-        super(Coordination, self).__init__(payoff_matrices=payoff_matrix, player_frequencies=player_dist, equilibrium_tolerance=equilibrium_tolerance)
+        super(Coordination, self).__init__(payoff_matrices=payoff_matrix,
+            player_frequencies=player_dist, equilibrium_tolerance=equilibrium_tolerance)
 
     @classmethod
     def classify(cls, params, state, tolerance):
-        # for convenience, we will guarantee that the state is normalized already to proportions, not absolute number of player
         p = params
         threshold = 1 - tolerance
 

@@ -1,21 +1,19 @@
 from plot import plot_data_for_players, GraphOptions
 
-def setupGraph(graph, game, dyn, burn, num_gens, results, payoffs):  # TODO allow ordering of various lines
+def setupGraph(graph, game=None, dyn=None, burn=None, num_gens=None, results=None, payoffs=None):  # TODO allow ordering of various lines
     if graph is True:
         graph = dict()
     graph_options = graph
     if 'options' in graph_options:
-        order = 1
         for key in graph_options['options']:
             graph_options[key] = True
 
-
     yPos = 0
 
-    if game.STRATEGY_LABELS is not None:
+    if game is not None and game.STRATEGY_LABELS is not None:
         graph_options[GraphOptions.LEGEND_LABELS_KEY] = lambda p, s: game.STRATEGY_LABELS[p][s]
 
-    if game.PLAYER_LABELS is not None:
+    if game is not None and game.PLAYER_LABELS is not None:
         graph_options[GraphOptions.TITLE_KEY] = lambda p: game.PLAYER_LABELS[p]
 
     if any(k in graph_options for k in ['payoffLine', 'modeStratLine', 'meanStratLine']):
@@ -71,7 +69,8 @@ def setupGraph(graph, game, dyn, burn, num_gens, results, payoffs):  # TODO allo
 
     graph_options[GraphOptions.NO_MARKERS_KEY] = True
 
-    plot_data_for_players(results, range(burn, num_gens), "Generation #", dyn.pm.num_strats,
+    if results is not None:
+        plot_data_for_players(results, range(burn, num_gens), "Generation #", dyn.pm.num_strats,
                           num_players=dyn.num_players,
                           graph_options=graph_options, yBot=yPos)
 

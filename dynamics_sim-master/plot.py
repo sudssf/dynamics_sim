@@ -89,10 +89,11 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
     graph_options = _append_options(graph_options)
 
     fontsize = 30
-    if 'smallFont' in graph_options:
+    if 'smallFont' in graph_options or 'smallfont' in graph_options:
         fontsize = 18
-    elif 'largeFont' in graph_options:
+    elif 'largeFont' in graph_options or 'largefont' in graph_options:
         fontsize = 36
+
 
     #Determine coloration
     if 'shading' in graph_options:
@@ -203,6 +204,12 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
     plt.show()
     
 def plot_contour_data_set(data, y_label, y_values, x_label, x_values, z_label, title, num_categories, graph_options=None):
+    fontsize = 30
+    if 'smallFont' in graph_options or 'smallfont' in graph_options:
+        fontsize = 18
+    elif 'largeFont' in graph_options or 'largefont' in graph_options:
+        fontsize = 36
+
     # Note it seems as though the x and y values are switched for contour plots
     
     graph_options = _append_options(graph_options)
@@ -235,9 +242,10 @@ def plot_contour_data_set(data, y_label, y_values, x_label, x_values, z_label, t
     for cat_i in range(n_cats):
         cs = ax[cat_i].contourf(x_values, y_values, data[:, :, cat_i], levels, colors=colors)
         fig.colorbar(cs, ax=ax[cat_i])
-        ax[cat_i].set_title(category_labels(cat_i))
-        ax[cat_i].set_xlabel(x_label)
-        ax[cat_i].set_ylabel(y_label)
+        ax[cat_i].set_title(category_labels(cat_i), fontsize=fontsize, fontweight='bold')
+        ax[cat_i].set_xlabel(x_label, fontsize=fontsize, fontweight='bold')
+        ax[cat_i].set_ylabel(y_label, fontsize=fontsize, fontweight='bold')
+        ax[cat_i].tick_params(axis='both', which='major', labelsize=fontsize)
 
         if 'lineArray' in graph_options:
             graphLines(graph_options['lineArray'], ax[cat_i])

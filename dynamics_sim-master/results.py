@@ -1,5 +1,6 @@
 __author__ = 'elubin'
 from plot import GraphOptions, plot_single_data_set, plot_3d_data_set, plot_contour_data_set
+from graphSetup import setupGraph
 import numpy
 
 # TODO: architecture to persist results of a single simulation across many runs
@@ -128,6 +129,7 @@ class TwoDimensionalData(NDimensionalData):
     A subclass that aids in the graphing of two dimension data (varying one parameter across a range of values)
     """
     def graph(self, equilibria, graph_options):
+        setupGraph(graph_options)
         graph_options[GraphOptions.LEGEND_LABELS_KEY] = lambda i: equilibria[i]
         x = self.independent_parameters[0]
         x_values = list(x)
@@ -144,6 +146,7 @@ class ThreeDimensionalData(NDimensionalData):
     A subclass that aids in the graphing of three dimensional data (varying two parameters)
     """
     def graph(self, equilibria, graph_options):
+        setupGraph(graph_options)
         graph_options[GraphOptions.LEGEND_LABELS_KEY] = lambda i: equilibria[i]
         x = self.independent_parameters[0]
         y = self.independent_parameters[1]
