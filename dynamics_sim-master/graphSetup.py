@@ -1,5 +1,6 @@
 from plot import plot_data_for_players, GraphOptions
 
+
 def setupGraph(graph, game=None, dyn=None, burn=None, num_gens=None, results=None, payoffs=None):  # TODO allow ordering of various lines
     if graph is True:
         graph = dict()
@@ -7,6 +8,7 @@ def setupGraph(graph, game=None, dyn=None, burn=None, num_gens=None, results=Non
     if 'options' in graph_options:
         for key in graph_options['options']:
             graph_options[key] = True
+        del graph_options['options']
 
     yPos = 0
 

@@ -14,7 +14,8 @@ class TestCase(unittest.TestCase):
 
     def test_contour_graph(self):  # 2d contour color plot
         s = VariedGame(Coordination, WrightFisher)
-        s.vary_2params('a', (0, 10, 25), 'b', (0, 10, 25), num_iterations=1, num_gens=50, burn=49, graph=dict(type='contour', options='smallfont', lineArray=[(0, 10, 0, 10)]))
+        s.vary_2params('a', (0, 10, 20), 'b', (0, 10, 20), num_iterations=50, num_gens=50, burn=49,
+                       graph=dict(type='contour', options=['smallfont'], lineArray=[(0, 10, 0, 10)]))
 
 
 if __name__ == '__main__':
