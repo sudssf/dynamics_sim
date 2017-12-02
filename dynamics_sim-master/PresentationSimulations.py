@@ -1,6 +1,6 @@
 from wrapper import GameDynamicsWrapper, VariedGame
 from dynamics.wright_fisher import WrightFisher
-from games.coordination import Coordination
+from games.hdb import HawkDoveBourgeois
 import unittest
 
 class TestCase(unittest.TestCase):
@@ -9,13 +9,8 @@ class TestCase(unittest.TestCase):
         logging.basicConfig(filename='debug.log', level=logging.DEBUG)
 
     def test_single_simulation(self):
-        s = GameDynamicsWrapper(Coordination, WrightFisher)
-        #s.simulate(num_gens=1000, graph=dict(options=['area', 'largeFont']))
-
-    def test_contour_graph(self):  # 2d contour color plot
-        s = VariedGame(Coordination, WrightFisher)
-        s.vary_2params('a', (0, 10, 20), 'b', (0, 10, 20), num_iterations=50, num_gens=50, burn=49,
-                       graph=dict(type='contour', options=['smallfont'], lineArray=[(0, 10, 0, 10)]))
+        s = GameDynamicsWrapper(HawkDoveBourgeois, WrightFisher)
+        s.simulate(num_gens=1000)#, graph=dict(options=['area', 'largeFont']))
 
 
 if __name__ == '__main__':
