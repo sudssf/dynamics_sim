@@ -58,9 +58,10 @@ class PayoffMatrix(object):
             matrix = matrix[idx]
         return matrix
 
-    def get_expected_payoff(self, player_idx, strategy, current_state):
+    def get_expected_payoff(self, player_idx, strategy, current_state, bias_func=None, bias_strength=-50.0):
         """
-        Get the expected payoff if the player at idx player_idx plays indexed by strategy given the current state.
+        Get the expected payoff if the player at idx player_idx plays indexed by strategy given the current state. The user can define a function
+        that encapsulates the notion of conformist bias i.e. a function of the player_idx frequencies is added to the expected payoff.
         @param player_idx: the index of the player for which to get the expected payoff
         @type player_idx: int
         @param strategy: the index that the player will play
@@ -68,11 +69,19 @@ class PayoffMatrix(object):
         @param current_state: The state of the population(s). Each entry in the parent array refers to a player type, each entry in each sublist refers to the number or
             frequency of players playing that strategy.
         @type current_state: list
+        @param bias_function: User defined or default bias_function
+        @type bias_function: lambda that takes in two arguments, the frequency of a player type playing a strategy and the bias strength. Returns modification to the payoff
         @return: the expected payoff
         @rtype: float
         """
-        return self._iterate_through_players(player_idx, 0, {player_idx: strategy}, 1.0, current_state)
-
+        n=current_state[player_idx][strategy]
+        p=float(n)/current_state[player_idx].sum()
+        if bias_func is None:
+            bias_func=lambda freq, bias: freq * bias
+        self.bias_func=lambda freq:float(bias_func(freq,bias_strength))
+        biased_payoff=self._iterate_through_players(player_idx, 0, {player_idx: strategy}, 1.0, current_state)+self.bias_func(p)
+        return biased_payoff
+    
     def _iterate_through_players(self, target_player_idx, current_player_idx, other_player_strategies, probability, current_state):
         if (len(other_player_strategies) == self.num_player_types and self.num_player_types != 1) or (len(other_player_strategies) == 2 and self.num_player_types == 1):
             # Second portion accounts for single player, TODO change (2) to dependent upon matrix depth
