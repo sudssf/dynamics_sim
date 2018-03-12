@@ -1,6 +1,7 @@
 __author__ = 'elubin'
 import numpy
 import logging
+import math
 
 
 class PayoffMatrix(object):
@@ -10,9 +11,10 @@ class PayoffMatrix(object):
     expected payoff given a distribution of players playing each strategy.
     """
 
-    def __init__(self, num_players, payoff_matrices):
+    def __init__(self, num_players, payoff_matrices, bias_strength):
         self.num_player_types = num_players
         self.payoff_matrices = payoff_matrices
+        self.bias_strength = bias_strength
         self.num_strats = []
         root = self.payoff_matrices[0]
         for i in range(self.num_player_types):
@@ -58,7 +60,7 @@ class PayoffMatrix(object):
             matrix = matrix[idx]
         return matrix
 
-    def get_expected_payoff(self, player_idx, strategy, current_state, bias_func=None, bias_strength=-50.0):
+    def get_expected_payoff(self, player_idx, strategy, current_state, bias_func=None):
         """
         Get the expected payoff if the player at idx player_idx plays indexed by strategy given the current state. The user can define a function
         that encapsulates the notion of conformist bias i.e. a function of the player_idx frequencies is added to the expected payoff.
@@ -77,8 +79,8 @@ class PayoffMatrix(object):
         n=current_state[player_idx][strategy]
         p=float(n)/current_state[player_idx].sum()
         if bias_func is None:
-            bias_func=lambda freq, bias: freq * bias
-        self.bias_func=lambda freq:float(bias_func(freq,bias_strength))
+            bias_func=lambda freq, bias: math.e**(freq * bias)
+        self.bias_func=lambda freq:float(bias_func(freq,self.bias_strength))
         biased_payoff=self._iterate_through_players(player_idx, 0, {player_idx: strategy}, 1.0, current_state)+self.bias_func(p)
         return biased_payoff
     

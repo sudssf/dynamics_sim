@@ -174,7 +174,7 @@ class StochasticDynamicsSimulator(DynamicsSimulator):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, fitness_func=None,  selection_strength=0.8,  *args, **kwargs):
+    def __init__(self, fitness_func=lambda p,w: p*w,  selection_strength=1.0,  *args, **kwargs):
         """
         The constructor for stochastic dynamics processes. They all reproduce based on relative fitness, so this
         abstract class provides a convenient fitness calculate function based on the current state using the provided
@@ -187,7 +187,7 @@ class StochasticDynamicsSimulator(DynamicsSimulator):
         """
         super(StochasticDynamicsSimulator, self).__init__(*args, stochastic=True, **kwargs)
         if fitness_func is None:
-            fitness_func = lambda p, w: math.e**(p*w)  # TODO it seems that overly large payoffs can lead to overflow errors
+            fitness_func = lambda p, w: math.e**(p*w) # TODO it seems that overly large payoffs can lead to overflow errors
         self.fitness_func = lambda payoff: float(fitness_func(payoff, selection_strength))
 
 

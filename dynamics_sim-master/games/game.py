@@ -25,7 +25,7 @@ class Game(object):
     EQUILIBRIA_LABELS = ()  #: a list of labels corresponding to the integers returned by the classify function
 
 
-    def __init__(self, payoff_matrices, player_frequencies, equilibrium_tolerance=0.1):
+    def __init__(self, payoff_matrices, player_frequencies, bias_strength, equilibrium_tolerance=0.1):
         """
         Initializes the game class with the give list of payoff matrices and distribution of players, as well as
         a notion of the equilibrium tolerance.
@@ -44,7 +44,7 @@ class Game(object):
         if self.PLAYER_LABELS is not None:
             assert len(player_frequencies) == len(self.PLAYER_LABELS)
 
-        self.pm = PayoffMatrix(len(player_frequencies), payoff_matrices)
+        self.pm = PayoffMatrix(len(player_frequencies), payoff_matrices, bias_strength)
         if self.STRATEGY_LABELS is not None:
             for labels_i, num_strats  in zip(self.STRATEGY_LABELS, self.pm.num_strats):
                 assert len(labels_i) == num_strats
@@ -248,7 +248,7 @@ class SymmetricNPlayerGame(Game):
     A convenience class that provides the logic for an N player game where each player chooses the from the same strategy
     set.
     """
-    def __init__(self, payoff_matrix, n, equilibrium_tolerance=0.1):
+    def __init__(self, payoff_matrix, n, bias_strength, equilibrium_tolerance=0.1):
         """
         Initialize the symmetric game with the given payoff matrix and number of playeres
 
@@ -267,7 +267,7 @@ class SymmetricNPlayerGame(Game):
         payoff_matrix_2 = tuple(map(tuple, zip(*payoff_matrix))) # transpose
         matrices = [payoff_matrix, payoff_matrix_2]
         player_dist = (1, )
-        super(SymmetricNPlayerGame, self).__init__(payoff_matrices=matrices, player_frequencies=player_dist, equilibrium_tolerance=equilibrium_tolerance)
+        super(SymmetricNPlayerGame, self).__init__(payoff_matrices=matrices, player_frequencies=player_dist, bias_strength=bias_strength, equilibrium_tolerance=equilibrium_tolerance)
 
 
 
