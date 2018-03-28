@@ -27,7 +27,7 @@ class TestCase(unittest.TestCase):
 
     def test_many_simulation(self):  # Determines which equilibria result based upon several simulations, text output
         s = GameDynamicsWrapper(CtsDisc, WrightFisher, dynamics_kwargs=dict(selection_strength=0.3))
-        #print(s.simulate_many(num_iterations=100, num_gens=190, graph=dict(shading='redblue', options=['area', 'noLegend', 'largeFont']), start_state=state))
+        print(s.simulate_many(num_iterations=100, num_gens=190, graph=dict(shading='redblue', options=['area', 'noLegend', 'largeFont']), start_state=state))
 
 if __name__ == '__main__':
     unittest.main()
