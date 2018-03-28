@@ -79,7 +79,7 @@ class PayoffMatrix(object):
         n=current_state[player_idx][strategy]
         p=float(n)/current_state[player_idx].sum()
         if bias_func is None:
-            bias_func=lambda freq, bias: math.e**(freq * bias)
+            bias_func=lambda freq, bias: freq * bias
         self.bias_func=lambda freq:float(bias_func(freq,self.bias_strength))
         biased_payoff=self._iterate_through_players(player_idx, 0, {player_idx: strategy}, 1.0, current_state)+self.bias_func(p)
         return biased_payoff
