@@ -177,7 +177,7 @@ class GameDynamicsWrapper(object):
             for genIdx, gen in enumerate(player):
                 if gen.sum() != 0:
                     gen /= gen.sum()
-                    gen *= dyn.num_players
+                    gen *= dyn.num_players[playerIdx]
 
         payoffsAvg = [numpy.zeros(shape=(num_gens - 1, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
         for iteration in range(num_iterations):
@@ -190,7 +190,7 @@ class GameDynamicsWrapper(object):
             for genIdx, gen in enumerate(player):
                 if gen.sum() != 0:
                     gen /= gen.sum()
-                    gen *= dyn.num_players
+                    gen *= dyn.num_players[playerIdx]
 
         if graph:
             setupGraph(graph, game, dyn, burn, num_gens, stratAvg, payoffs[0])
