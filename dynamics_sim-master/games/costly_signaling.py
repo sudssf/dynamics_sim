@@ -2,14 +2,14 @@ from games.game import Game
 
 
 class CostlySignaling(Game):
-    DEFAULT_PARAMS = dict(lCost=1, hCost=1, a=5, aHigh=10, aLow=-10, lProp=2, hProp=1)
+    DEFAULT_PARAMS = dict(lCost=3, hCost=1, a=5, aHigh=10, aLow=-10, lProp=2, hProp=1, bias_strength=0)
     PLAYER_LABELS = ('Low Sender', 'High Sender', 'Receiver')
     STRATEGY_LABELS = (('No', 'Low', 'Medium', 'High'),
                        ('No', 'Low', 'Medium', 'High'),
                        ('Accept all', 'Accept Low', 'Accept Medium', 'Accept High', 'Reject All'))
     EQUILIBRIA_LABELS = ('Pooling with rejection', 'Pooling with acceptance', 'Efficient separating', 'Ostentatious separating', 'Simple Separating')
 
-    def __init__(self, lCost, hCost, a, aHigh, aLow, lProp, hProp, equilibrium_tolerance=0.2):
+    def __init__(self, lCost, hCost, a, aHigh, aLow, lProp, hProp, bias_strength, equilibrium_tolerance=0.2):
         lProp, hProp = lProp/(lProp+hProp), hProp/(lProp+hProp)
         lProp /= 2
         hProp /= 2
@@ -41,7 +41,7 @@ class CostlySignaling(Game):
 
         payoff_matrix = [payoff_matrix_p1, payoff_matrix_p2, payoff_matrix_p3]
         player_dist = (lProp, hProp, 1/2)
-        super(CostlySignaling, self).__init__(payoff_matrices=payoff_matrix, player_frequencies=player_dist, equilibrium_tolerance=equilibrium_tolerance)
+        super(CostlySignaling, self).__init__(payoff_matrices=payoff_matrix, player_frequencies=player_dist, bias_strength=bias_strength, equilibrium_tolerance=equilibrium_tolerance)
         
     @classmethod
     def classify(cls, params, state, tolerance):

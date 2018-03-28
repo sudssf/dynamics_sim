@@ -185,7 +185,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
                 
             labels = [category_labels(i, j) for j in range(n_cats)]
 
-            legend = plt.legend(labels, loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY], fontsize=fontsize)
+            legend = plt.legend(labels, loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY], fontsize=fontsize,prop={'size': 10})
             if 'nolegend' in graph_options or 'noLegend' in graph_options:
                 legend.remove()
 
