@@ -131,7 +131,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
         # graph the results
         for i, data_i in enumerate(data):
             rawData = copy.deepcopy(data_i)
-            plt.figure(i)
+            fig=plt.figure(i)
             plt.title(title_i(i))
             
             if 'area' in graph_options:
@@ -182,7 +182,8 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
                         plt.fill_between(x_values, data_i[:, cat_i], data_i[:, cat_i-1], color=colors[cat_i % n_cats])
                 
                 plt.plot(x_values, data_i[:, cat_i], c=colors[cat_i % n_cats], lw=2, marker=marker)
-                
+            
+              
             labels = [category_labels(i, j) for j in range(n_cats)]
 
             legend = plt.legend(labels, loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY], fontsize=fontsize,prop={'size': 10})
@@ -200,6 +201,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
                 graphColoredLines(graph_options['colorLineArray'][i], plt, colors)
             if 'textList' in graph_options:
                 plotText(graph_options['textList'], plt, fontsize=fontsize)
+            fig.savefig('%s.png'%labels[0])
 
     plt.show()
     

@@ -52,7 +52,7 @@ class PayoffMatrix(object):
         @type recipient: int
         @param strats: the iterable of strategies played by each player, in the order of their indices
         @type strats: list(int)
-        @return: the payoff that the recipient gets from all playres playing the given strategy
+        @return: the payoff that the recipient gets from all players playing the given strategy
         @rtype: float
         """
         matrix = self.payoff_matrices[recipient]
@@ -63,7 +63,7 @@ class PayoffMatrix(object):
     def get_expected_payoff(self, player_idx, strategy, current_state, bias_func=None):
         """
         Get the expected payoff if the player at idx player_idx plays indexed by strategy given the current state. The user can define a function
-        that encapsulates the notion of conformist bias i.e. a function of the player_idx frequencies is added to the expected payoff.
+        that encapsulates the notion of frequency dependent bias i.e. a function of the player_idx frequencies is added to the expected payoff.
         @param player_idx: the index of the player for which to get the expected payoff
         @type player_idx: int
         @param strategy: the index that the player will play
@@ -76,12 +76,14 @@ class PayoffMatrix(object):
         @return: the expected payoff
         @rtype: float
         """
-        n=current_state[player_idx][strategy]
-        p=float(n)/current_state[player_idx].sum()
+        current=numpy.asarray(current_state[player_idx])
+        current_freq=current/sum(current)
+        squared_sum=sum(current_freq**2)
+        # Defining the default function as developed by Nakahashi. This should be modified according to the nature of the fitness function being considered.
         if bias_func is None:
-            bias_func=lambda freq, bias: freq * bias
+            bias_func=lambda freq, bias: ((freq**2/squared_sum)) * bias
         self.bias_func=lambda freq:float(bias_func(freq,self.bias_strength))
-        biased_payoff=self._iterate_through_players(player_idx, 0, {player_idx: strategy}, 1.0, current_state)+self.bias_func(p)
+        biased_payoff=self._iterate_through_players(player_idx, 0, {player_idx: strategy}, 1.0, current_state)+self.bias_func(current_freq[strategy])
         return biased_payoff
     
     def _iterate_through_players(self, target_player_idx, current_player_idx, other_player_strategies, probability, current_state):
