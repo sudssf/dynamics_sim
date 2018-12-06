@@ -7,7 +7,7 @@ DyPy provides [Moran](http://en.wikipedia.org/wiki/Moran_process), and
 
 See documentation [here](http://ecbtln.github.io).
 
-####Requirements
+# Requirements #
 
 DyPy depends on [matplotlib](http://matplotlib.org) for graphing, and [numpy](http://www.numpy.org) and 
 [joblib](https://pythonhosted.org/joblib/). To install these dependencies, make sure you are in the root 
@@ -17,7 +17,7 @@ directory of the repo and run the following command, which may require sudo.
 $ pip install -r requirements.txt
 ```
 
-####Usage
+# Usage #
 
 The easiest way to get started with DyPy is to subclass the ```Game``` class and define the game that of
  interest to be simulated by defining its payoff matrix appropriately as a function of various parameters.
@@ -40,7 +40,7 @@ To see an example, take a look at the [*Cooperate Without Looking*]
 (https://github.com/ecbtln/cwol_sim/blob/master/cwol.py) subclass along with its associated 
 [simulations](https://github.com/ecbtln/cwol_sim/blob/master/test.py).
 
-####Persistence (coming soon)
+# Persistence # (coming soon)
 
 DyPy decouples the process of simulating with graphing. This encourages users to run long-running 
 simulations and gather tons of data, and then insert and tweak the graph parameters afterwards.
