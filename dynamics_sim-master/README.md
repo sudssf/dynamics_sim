@@ -40,7 +40,7 @@ To see an example, take a look at the [*Cooperate Without Looking*]
 (https://github.com/ecbtln/cwol_sim/blob/master/cwol.py) subclass along with its associated 
 [simulations](https://github.com/ecbtln/cwol_sim/blob/master/test.py).
 
-# Persistence # (coming soon)
+# Persistence (coming soon)
 
 DyPy decouples the process of simulating with graphing. This encourages users to run long-running 
 simulations and gather tons of data, and then insert and tweak the graph parameters afterwards.
