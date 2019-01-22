@@ -1,12 +1,12 @@
 __author__ = 'eblubin@mit.edu'
 import numpy as np
-from dynamics.dynamics import StochasticDynamicsSimulator
+from dynamics.dynamics import DynamicsSimulator
 
 
-class WrightFisher(StochasticDynamicsSimulator):
+class WrightFisher(DynamicsSimulator):
     def __init__(self, mu=0.05, *args, **kwargs):
         # TODO don't allow pop_size of 0, wright fisher only works with finite pop size
-        super(WrightFisher, self).__init__(*args, **kwargs)
+        super(WrightFisher, self).__init__(*args,stochastic=True,**kwargs)
         self.mu = mu
 
     def next_generation(self, previous_state):

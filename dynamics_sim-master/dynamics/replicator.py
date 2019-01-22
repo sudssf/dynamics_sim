@@ -1,7 +1,7 @@
-from dynamics.dynamics import StochasticDynamicsSimulator
+from dynamics.dynamics import DynamicsSimulator
 import numpy as np
 
-class Replicator(StochasticDynamicsSimulator):
+class Replicator(DynamicsSimulator):
     """
     A stochastic dynamics simulator which performs replicator dynamics on all player types in the population.
     """
@@ -12,7 +12,7 @@ class Replicator(StochasticDynamicsSimulator):
         @param num_iterations_per_time_step: the number of iterations of the Moran process we do per time step
         @type num_iterations_per_time_step: int
         """
-        super(Replicator, self).__init__(*args, **kwargs)
+        super(Replicator, self).__init__(*args,stochastic=False,**kwargs)
         self.generation_skip = generation_skip
         
     def next_generation(self, previousState):

@@ -242,7 +242,8 @@ class Game(object):
         #par_for()(delayed(do_work)() for _ in range(multiprocessing.cpu_count()))
 
 
-# common case is n =2, but we support as big N as needed
+# common case is n =2, but we support as big N as needed...This is not very clear, well-defined...CHANGE
+# Why is this even needed as a subclass?
 class SymmetricNPlayerGame(Game):
     """
     A convenience class that provides the logic for an N player game where each player chooses the from the same strategy
@@ -250,11 +251,11 @@ class SymmetricNPlayerGame(Game):
     """
     def __init__(self, payoff_matrix, n, bias_strength, equilibrium_tolerance=0.1):
         """
-        Initialize the symmetric game with the given payoff matrix and number of playeres
+        Initialize the symmetric game with the given payoff matrix and number of players
 
         @param payoff_matrix: a recursive list representing the payoff matrix for each player, see L{PayoffMatrix}
         @type payoff_matrix: list(list())
-        @param n: the number of players in the game
+        @param n: the number of player types in the game which is generally 1 for a 2 player symmetric game.
         @type n: int
         """
         if self.STRATEGY_LABELS is not None:
@@ -265,8 +266,8 @@ class SymmetricNPlayerGame(Game):
 
         # interpreted as multiple instances of the same player, append the transpose
         payoff_matrix_2 = tuple(map(tuple, zip(*payoff_matrix))) # transpose
-        matrices = [payoff_matrix, payoff_matrix_2]
-        player_dist = (1, )
+        matrices = [payoff_matrix,payoff_matrix_2] # Payoff Matrix 2 doesn't really do anything here. CHANGE
+        player_dist = (1, ) # Works only for n=1 player type
         super(SymmetricNPlayerGame, self).__init__(payoff_matrices=matrices, player_frequencies=player_dist, bias_strength=bias_strength, equilibrium_tolerance=equilibrium_tolerance)
 
 
