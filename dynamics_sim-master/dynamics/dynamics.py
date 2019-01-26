@@ -3,7 +3,6 @@ from abc import ABCMeta, abstractmethod
 import heapq
 import math
 import numpy as np
-from itertools import chain
 # The precision of the decimal comparison operations this should not need any changing
 DECIMAL_PRECISION = 5
 
@@ -61,7 +60,7 @@ class DynamicsSimulator(object):
 
 
     @abstractmethod
-    def next_generation(self, previous):
+    def next_generation(self, previous, group_selection, rate):
         """
         An abstract method that must be overridden assuming the default implementation of the simulate() method in
         order to define the state transition from generation i to generation i + 1.
@@ -70,7 +69,11 @@ class DynamicsSimulator(object):
             entry in the parent array refers to a player type, each entry in each sublist refers to the number or
             frequency of players playing that strategy.
         @type previous: list
-        @return: the subsequent distribution of players by player type, after the state transition
+        @param group_selection: Where the simulation is incorporating group selection
+        @type group_selection: Boolean
+        @param rate: Rate of group selection
+        @type rate: float
+        @return: the subsequent distribution of players by player type and fitnesses, after the state transition
         @rtype: list
         """
         return [],[]
@@ -97,7 +100,7 @@ class DynamicsSimulator(object):
 
         return s
 
-    def simulate(self, num_gens=100, debug_state=None, group_selection=False):
+    def old_simulate(self, num_gens=100, debug_state=None, group_selection=False):
         """
         Simulate the game for the given number of generations, optionally starting at a provided state. Subclasses may
         override this method if they would like to calculate the dynamics in an alternate fashion other than the
@@ -133,7 +136,7 @@ class DynamicsSimulator(object):
             strategies[i][0, :] = x
 
         for gen in range(num_gens - 1):
-            state, fitness = self.next_generation(state, group_selection)
+            state, fitness = self.next_generation(state, group_selection,0)
             state = self.validate_state(state)
             
             # record state
@@ -144,60 +147,62 @@ class DynamicsSimulator(object):
         
         return strategies, payoffs
     
-    def gs_simulate(self,num_gens=100,start_state=None,number_groups=3,rate=0.01,group_selection=True):
+    def simulate(self, num_gens=100, number_groups=1, rate=0.001, start_state=None):
         """
         Group theory simulation for a given number of generations, optionally starting at a provided state. 
         To Do: Better way to deal with population in each group
         
         @param num_gens: the number of iterations of the simulation.
         @type num_gens: int
-        @param start_state: An optional list of distributions of strategies for each player.
-        @type start_state: list or None
         @param number_groups: Number of groups in the system
         @type number_groups: int
         @param rate: Rate at which groups reproduce.
         @type rate: float
+        @param start_state: An optional list of distributions of strategies for each player.
+        @type start_state: list or None
         @return: the list of states that the simulation steps through in each generation
         @rtype: list(list(nxm array)) where n:number of player types,m:number of strategies, list over the number of groups.
         """
+        if number_groups > 1:
+            group_selection = True
+        else:
+            group_selection = False
+            
         # Set up the start state if not specified and validate it otherwise
         if start_state is None:
             start_state=[]
-            distribution_for_player = lambda n_p, n_s: np.random.multinomial(n_p, [1./n_s] * n_s)
+            if not self.infinite_pop_size:
+                if self.uniDist:
+                    distribution_for_player = lambda n_p, n_s: np.random.uniform(0, 1, n_s)
+                else:
+                    distribution_for_player = lambda n_p, n_s: np.random.multinomial(n_p, [1./n_s] * n_s)
+            else:
+                distribution_for_player = lambda n_p, n_s: np.random.dirichlet([1] * n_s) * n_p
             for i in range(number_groups):
                 start_state.append([distribution_for_player(n_p, n_s) for n_p, n_s in zip(self.num_players, self.pm.num_strats)])
         else:
             assert len(start_state)==number_groups
             for i in range(number_groups):
                 start_state[i] = self.validate_state(start_state[i])
-                
-        # Store the strategy frequencies and payoffs received at each time step
-        results=[]
+               
+        # Store the strategy frequencies and payoffs received at each time step, add initial states???????
+        strategies=[]
         payoffs=[]
-        
-        # Actual simulation consisting of two Moran processes, one at the level of the group and one in between the groups.
+
+        # Actual simulation consisting of two levels of dynamics, one at the level of the group and one in between the groups.
         for i in range(num_gens):
-            # At each time step there is some probability of group selection
-            if i!=0 and np.random.uniform(0,1)<rate:
-                results.append(results[i-1].copy())
-                payoffs.append(payoffs[i-1].copy())
-                avg_payoffs=[]
-                for k in range(number_groups):
-                    avg_payoffs.append(sum(chain(*payoffs[i][k]))/sum(chain(*(sum(payoffs[i][j] for j in range(number_groups))))))
-                # Picking the group that shall reproduce and the one it replaces
-                reproduction = np.random.multinomial(1,avg_payoffs)
-                reproduction_index = np.nonzero(reproduction)[0][0]
-                replacement_event=np.random.randint(0,number_groups)
-                results[i][replacement_event]=results[i][reproduction_index]
-            else:
-                # Intra group Moran
-                r,p=self.next_generation(start_state,group_selection)
-                results.append(np.array([r[i] for i in range(number_groups)]))
-                payoffs.append(np.array([p[i] for i in range(number_groups)]))
-            
-            start_state=results[i]
-        # Validate state at each step?    
-        return results, payoffs
+            r,p=self.next_generation(start_state,group_selection,rate)
+            strategies.append(np.array([r[i] for i in range(number_groups)]))
+            payoffs.append(np.array([p[i] for i in range(number_groups)]))
+            start_state=strategies[i]
+            for j in range(number_groups):
+                start_state[j] = self.validate_state(start_state[j])   
+        
+        # Create lists that contain the total normalized frequency and payoffs associated with each player type across groups per time step
+        strategies_total=[np.array([np.sum(strategies[i][j][k] for j in range(number_groups))/number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
+        payoffs_total=[np.array([np.sum(payoffs[i][j][k] for j in range(number_groups))/number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
+
+        return strategies_total, payoffs_total
 
 
     @staticmethod
