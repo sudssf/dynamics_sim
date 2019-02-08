@@ -111,53 +111,6 @@ class DynamicsSimulator(object):
 
         return s
 
-    def old_simulate(self, num_gens=100, debug_state=None, group_selection=False):
-        """
-        Simulate the game for the given number of generations, optionally starting at a provided state. Subclasses may
-        override this method if they would like to calculate the dynamics in an alternate fashion other than the
-        traditional timestep method.
-        
-        If using a uniform distribution ignore the first generation
-
-        @param num_gens: the number of iterations of the simulation.
-        @type num_gens: int
-        @param debug_state: An optional list of distributions of strategies for each player.
-        @type debug_state: list or None
-        @return: the list of states that the simulation steps through in each generation
-        @rtype: list(2x2 array)
-        """
-
-        if debug_state is not None:
-            state= self.validate_state(debug_state)
-        else:
-            if not self.infinite_pop_size:
-                if self.uniDist:
-                    distribution_for_player = lambda n_p, n_s: np.random.uniform(0, 1, n_s)
-                else:
-                    distribution_for_player = lambda n_p, n_s: np.random.multinomial(n_p, [1./n_s] * n_s)
-            else:
-                distribution_for_player = lambda n_p, n_s: np.random.dirichlet([1] * n_s) * n_p
-
-            state = [distribution_for_player(n_p, n_s) for n_p, n_s in zip(self.num_players, self.pm.num_strats)]
-        strategies = [np.zeros((num_gens, x)) for x in self.pm.num_strats]
-        payoffs = [np.zeros((num_gens, x)) for x in self.pm.num_strats]
-
-        # record initial state
-        for i, x in enumerate(state):
-            strategies[i][0, :] = x
-
-        for gen in range(num_gens - 1):
-            state, fitness = self.next_generation(state, group_selection,0)
-            state = self.validate_state(state)
-            
-            # record state
-            for i, x in enumerate(state):
-                strategies[i][gen + 1, :] = x
-            for i, x in enumerate(fitness):
-                payoffs[i][gen + 1, :] = x
-        
-        return strategies, payoffs
-    
     def simulate(self, num_gens=100, start_state=None):
         """
         Group theory simulation for a given number of generations, optionally starting at a provided state. 
