@@ -131,7 +131,7 @@ class GameDynamicsWrapper(object):
             else:
                 return frequencies, results, payoffs
             
-    def simulate(self, num_gens=DEFAULT_GENERATIONS, number_groups=1, group_size=100, rate=0.01, start_state=None, graph=True, return_labeled=True, burn=0, class_end=False):
+    def simulate(self, num_gens=DEFAULT_GENERATIONS, number_groups=1, pop_size=100, rate=0.001, start_state=None, graph=True, return_labeled=True, burn=0, class_end=False):
         """
         Simulate a game in the presence of group selection for a specific number of generations optionally
         graphing the results
@@ -157,11 +157,11 @@ class GameDynamicsWrapper(object):
         """
         game = self.game_cls(**self.game_kwargs)
         dyn = self.dynamics_cls(payoff_matrix=game.pm,
-                                player_frequencies=game.player_frequencies,pop_size=group_size,
+                                player_frequencies=game.player_frequencies,number_groups=number_groups,pop_size=pop_size,rate=rate,
                                 **self.dynamics_kwargs)
         
         # Group Selection simulation for a given number of generations.
-        results_total,payoffs_total=dyn.simulate(num_gens,number_groups,rate,start_state)
+        results_total,payoffs_total=dyn.simulate(num_gens,start_state)
 
         # Classify the equilibria and plot the results
         params = Obj(**self.game_kwargs)
@@ -190,7 +190,7 @@ class GameDynamicsWrapper(object):
             
     # Add ways to plot the evolution of strategies in a single group?
         
-    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, number_groups=1, group_size=100, rate=0.001, start_state=None, graph=False, return_labeled=True, burn=0, parallelize=True, class_end=False):
+    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, number_groups=1, pop_size=100, rate=0.001, start_state=None, graph=False, return_labeled=True, burn=0, parallelize=True, class_end=False):
         """
         A helper method to call the simulate methods num_iterations times simulating num_gens generations each time,
         and then averaging the frequency of the resulting equilibria. Method calls are parallelized and attempt to
@@ -212,10 +212,10 @@ class GameDynamicsWrapper(object):
         # TODO move this graphing into graphSetup and link it to extra options
         game = self.game_cls(**self.game_kwargs)
         dyn = self.dynamics_cls(payoff_matrix=game.pm,
-                                player_frequencies=game.player_frequencies,pop_size=group_size,
+                                player_frequencies=game.player_frequencies,number_groups=number_groups,pop_size=pop_size,rate=rate,
                                 **self.dynamics_kwargs)
         frequencies = np.zeros(self.game_cls.num_equilibria())
-        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, number_groups=number_groups, group_size=group_size, rate=rate, start_state=start_state, burn=burn, class_end=class_end) for iteration in range(num_iterations))
+        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, number_groups=number_groups, pop_size=pop_size, rate=rate, start_state=start_state, burn=burn, class_end=class_end) for iteration in range(num_iterations))
 
         equilibria = []
         strategies = [0]*num_iterations
