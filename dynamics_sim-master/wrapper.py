@@ -62,74 +62,7 @@ class GameDynamicsWrapper(object):
     def stationaryDistribution(self):
         pass
 
-    def old_simulate(self, num_gens=DEFAULT_GENERATIONS, graph=True, burn=0, return_labeled=True, pop_size=100, start_state=None, class_end=False):
-        """
-        Simulate the game for the given number of generations with the specified dynamics class and optionally graph the results
 
-        @param num_gens: the number of iterations of the simulation.
-        @type num_gens: int
-        @param graph: the type of graph (false if no graph is wished)
-        @type graph: dict, bool
-        @param return_labeled: whether the distribution of classified equilibria that are returned should be labelled
-            or simply listed with their keys inferred by their order
-        @type return_labeled: bool
-        @param start_state: whether the starting state is to be predetermined
-        @type start_state: list
-        @param graph_payoffs: to graph the payoffs for each generation
-        @type graph_payoffs: bool
-        @param graph_payoff_line: to show the dominate strategy for each generation of the game underneath the graph
-        @type graph_payoff_line: bool
-        @return: the frequency of time spent in each equilibria, defined by the game
-        @rtype: np.ndarray or dict
-        """
-        game = self.game_cls(**self.game_kwargs)
-        dyn = self.dynamics_cls(payoff_matrix=game.pm,
-                                player_frequencies=game.player_frequencies,pop_size=pop_size,
-                                **self.dynamics_kwargs)
-        results, payoffs = dyn.simulate(num_gens=num_gens, debug_state=start_state)
-    
-        # results_obj = SingleSimulationOutcome(self.dynamics_cls, self.dynamics_kwargs, self.game_cls, self.game_kwargs, results)
-        # TODO: serialize results to file
-        params = Obj(**self.game_kwargs)
-        frequencies = np.zeros(self.game_cls.num_equilibria())  # one extra for the Unclassified key
-
-        for playerIdx, player in enumerate(payoffs):
-            payoffs[playerIdx] = np.delete(player, (0), axis=0)
-
-        if burn:
-            for index, array in enumerate(results):
-                results[index] = array[burn:]
-
-        if dyn.stochastic:
-            classifications = []
-            if class_end:  # Only classify the final generation
-                lastGenerationState = [np.zeros(len(player[0])) for player in results]
-                for playerIdx, player in enumerate(results):
-                    for stratIdx, strat in enumerate(player[-1]):
-                        lastGenerationState[playerIdx][stratIdx] = strat
-                    lastGenerationState[playerIdx] /= lastGenerationState[playerIdx].sum()
-                equi = game.classify(params, lastGenerationState, game.equilibrium_tolerance)
-                frequencies = np.zeros(self.game_cls.num_equilibria())
-                frequencies[equi] = 1
-            else:  # Classify every generation
-                for state in zip(*results):
-                    state = [x / x.sum() for x in state]
-                    equi = game.classify(params, state, game.equilibrium_tolerance)
-                    # note, if equi returns -1, then the -1 index gets the last entry in the array
-                    classifications.append(equi)
-                    frequencies[equi] += 1
-        else:
-            last_generation_state = results[-1]
-            classification = game.classify(params, last_generation_state, game.equilibrium_tolerance)
-            frequencies[classification] = 1
-       
-        if graph:
-            setupGraph(graph, game, dyn, burn, num_gens, results, payoffs)
-        else:
-            if return_labeled:
-                return self._convert_equilibria_frequencies(frequencies)
-            else:
-                return frequencies, results, payoffs
             
     def simulate(self, num_gens=DEFAULT_GENERATIONS, number_groups=1, pop_size=100, rate=0.001, start_state=None, graph=True, return_labeled=True, burn=0, class_end=False):
         """
