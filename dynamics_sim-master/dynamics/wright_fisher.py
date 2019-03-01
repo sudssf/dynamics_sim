@@ -53,10 +53,15 @@ class WrightFisher(DynamicsSimulator):
                         new_player_state[strategy_idx] = n * f
                             
                         # distribute player strategies proportional n * f
-                        # don't use multinomial, because that adds randomness we don't want yet
-                    new_player_state *= float(num_players - total_mutations) / new_player_state.sum()
-                    new_player_state = np.array(self.round_individuals(new_player_state))
-
+                        # don't use multinomial, because that adds randomness we don't want yet.
+                
+                    if new_player_state.sum() != 0: 
+                        new_player_state *= float(num_players - total_mutations) / new_player_state.sum()
+                        new_player_state = np.array(self.round_individuals(new_player_state))
+                        
+                    else: # Make sure that mutations get randomly distributed if they lead to a zero population size
+                        new_player_state = np.zeros(num_strats)
+                        
                     new_player_state += np.random.multinomial(total_mutations, [1. / num_strats] * num_strats)
                     new_group_state.append(new_player_state)
                 next_state.append(new_group_state)

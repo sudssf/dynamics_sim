@@ -15,7 +15,7 @@ class DynamicsSimulator(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, payoff_matrix, player_frequencies, number_groups=1, pop_size=100, rate=0.001, stochastic=False, uniDist=False, fitness_func= None, selection_strength=1.0):
+    def __init__(self, payoff_matrix, player_frequencies, number_groups=1, pop_size=100, rate=0.5, stochastic=False, uniDist=False, fitness_func= None, selection_strength=1.0):
         """
         The constructor for the abstract class. This doesn't need to be called directly, as it is called by @see
         L{GameDynamicsWrapper}
@@ -57,7 +57,7 @@ class DynamicsSimulator(object):
             self.num_players = player_frequencies
             self.infinite_pop_size = True
         self.pop_size = pop_size
-        self.number_groups = number_groups
+        self.number_groups = int(number_groups)
         self.rate = rate
         self.pm = payoff_matrix
         self.stochastic = stochastic
@@ -159,8 +159,8 @@ class DynamicsSimulator(object):
                 start_state[j] = self.validate_state(start_state[j])   
         
         # Create lists that contain the total normalized frequency and payoffs associated with each player type across groups per time step
-        strategies_total=[np.array([np.sum(strategies[i][j][k] for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
-        payoffs_total=[np.array([np.sum(payoffs[i][j][k] for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
+        strategies_total=[np.array([np.sum(np.array(strategies[i][j][k]) for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
+        payoffs_total=[np.array([np.sum(np.array(payoffs[i][j][k]) for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
 
         return strategies_total, payoffs_total
 
