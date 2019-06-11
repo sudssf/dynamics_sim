@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import heapq
 import math
 import numpy as np
+from itertools import chain
 # The precision of the decimal comparison operations this should not need any changing
 DECIMAL_PRECISION = 5
 
@@ -15,7 +16,7 @@ class DynamicsSimulator(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, payoff_matrix, player_frequencies, number_groups=1, pop_size=100, rate=0.5, stochastic=False, uniDist=False, fitness_func= None, selection_strength=1.0):
+    def __init__(self, payoff_matrix, player_frequencies, number_groups=1, pop_size=100, rate=0.01, stochastic=True, uniDist=False, fitness_func= None, selection_strengthI=0.8, selection_strengthG=0.8):
         """
         The constructor for the abstract class. This doesn't need to be called directly, as it is called by @see
         L{GameDynamicsWrapper}
@@ -37,7 +38,9 @@ class DynamicsSimulator(object):
         @type uniDist: bool
         @param fitness_func: A function that maps payoff to fitness
         @type fitness_func: lambda that takes in two arguments, the payoff and the selection strength, and returns the fitness
-        @param selection_strength: the selection strength that will be used in the fitness function
+        @param selection_strengthI: the selection strength that will be used in the fitness function at the individual level
+        @type selection_strength: float
+        @param selection_strengthG: the selection strength that will be used in the fitness function at the group level
         @type selection_strength: float
         """
         assert math.fsum(player_frequencies) == 1.0
@@ -61,13 +64,14 @@ class DynamicsSimulator(object):
         self.rate = rate
         self.pm = payoff_matrix
         self.stochastic = stochastic
-        self.selection_strength = selection_strength
+        self.selection_strengthI = selection_strengthI
+        self.selection_strengthG = selection_strengthG
         if fitness_func is None:
             if stochastic:
                 fitness_func = lambda p, w: math.e**(p*w)
             else:
                 fitness_func = lambda p, w: p*w
-            self.fitness_func = lambda payoff: float(fitness_func(payoff, self.selection_strength))
+        self.fitness_func = lambda payoff, w: float(fitness_func(payoff, w))
 
 
     @abstractmethod
@@ -144,20 +148,26 @@ class DynamicsSimulator(object):
             assert len(start_state)==self.number_groups
             for i in range(self.number_groups):
                 start_state[i] = self.validate_state(start_state[i])
-               
-        # Store the strategy frequencies and payoffs received at each time step, add initial states???????
-        strategies=[]
-        payoffs=[]
+        
+        # Setting the initial payoffs to zero
+        initial_payoffs = []
+        for i in range(self.number_groups):
+            initial_payoffs.append([0*distribution_for_player(n_p, n_s) for n_p, n_s in zip(self.num_players, self.pm.num_strats)])
 
+        # Store the strategy frequencies and payoffs received at each time step
+        strategies=[start_state]
+        payoffs=[initial_payoffs]
+        
         # Actual simulation consisting of two levels of dynamics, one at the level of the group and one in between the groups.
         for i in range(num_gens):
             r,p=self.next_generation(start_state,group_selection,self.rate)
-            strategies.append(np.array([r[i] for i in range(self.number_groups)]))
-            payoffs.append(np.array([p[i] for i in range(self.number_groups)]))
-            start_state=strategies[i]
+            strategies.append(np.array([r[j] for j in range(self.number_groups)]))
+            payoffs.append(np.array([p[j] for j in range(self.number_groups)]))
+            start_state=strategies[i+1]
             for j in range(self.number_groups):
-                start_state[j] = self.validate_state(start_state[j])   
-        
+                start_state[j] = self.validate_state(start_state[j]) 
+  
+
         # Create lists that contain the total normalized frequency and payoffs associated with each player type across groups per time step
         strategies_total=[np.array([np.sum(np.array(strategies[i][j][k]) for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
         payoffs_total=[np.array([np.sum(np.array(payoffs[i][j][k]) for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
@@ -194,10 +204,22 @@ class DynamicsSimulator(object):
                 int_num_senders[i] += 1
                 diff -= 1
         assert sum(int_num_senders) == total, "the total number of individuals after rounding must be the same as before rounding"
-
         return int_num_senders
     
-    def calculate_fitnesses(self, state):
+    def calculate_payoffs(self, state):
+        """
+        """
+        payoff = [[self.pm.get_expected_payoff(p_idx, s_idx, state)
+                       for s_idx in range(num_strats_i)]
+                      for p_idx, num_strats_i in enumerate(self.pm.num_strats)]
+
+        
+        # Average payoff of all members in a group. Lengths could be written better?
+        avg_group_payoff = sum([payoff[i][j]*state[i][j] for i in range(len(payoff)) for j in range(len(payoff[0]))])/sum(chain(*state))
+       
+        return payoff, avg_group_payoff
+    
+    def calculate_fitnesses(self, payoff, selection_strength):
         """
         Given the payoff matrix for the dynamics simulation, calculate the expected payoff of playing each strategy
         for each player, as a function of the payoff for that strategy and the relative frequency of players playing
@@ -208,10 +230,9 @@ class DynamicsSimulator(object):
         @return: a 2D array representing the fitness of playing each strategy for each player
         @rtype: list(list())
         """
-        # Calculate expected payoffs each player gets by playing a particular strategy based on the current state
-        payoff = [[self.pm.get_expected_payoff(p_idx, s_idx, state)
-                       for s_idx in range(num_strats_i)]
-                      for p_idx, num_strats_i in enumerate(self.pm.num_strats)]
-
         # Calculate fitness for each individual in the population (based on what strategy they are playing)
-        return [[self.fitness_func(p) for p in j] for j in payoff]
+        fitness = [[self.fitness_func(p,selection_strength) for p in j] for j in payoff]
+
+        
+        return fitness
+    

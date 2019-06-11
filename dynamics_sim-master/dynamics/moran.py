@@ -1,6 +1,5 @@
 from dynamics.dynamics import DynamicsSimulator
 import numpy as np
-from itertools import chain
 
 class Moran(DynamicsSimulator):
     """
@@ -10,14 +9,14 @@ class Moran(DynamicsSimulator):
     def __init__(self, num_iterations_per_time_step=1,*args, **kwargs):
         """
         The constructor for the Moran dynamics process, that the number of births/deaths to process per time step.
-
+        Mutations are incorporated at the individual level for now.
         @param num_iterations_per_time_step: the number of iterations of the Moran process we do per time step
         @type num_iterations_per_time_step: int
         """
         super(Moran, self).__init__(*args,stochastic=True,**kwargs)
         assert num_iterations_per_time_step >= 1
         self.num_iterations_per_time_step = num_iterations_per_time_step
-        self.mu=0.01
+        self.mu=0.0
 
     def next_generation(self, previous_state, group_selection, rate):
         next_state = []
@@ -26,11 +25,17 @@ class Moran(DynamicsSimulator):
         for p in previous_state:
             next_state.append(p.copy())    
             
-        number_groups=len(previous_state)
+        number_groups = len(previous_state)
+        payoff = []
+        avg_payoffs = []
         fitness = []
-        for i in range(len(previous_state)):
-            fitness.append(self.calculate_fitnesses(next_state[i]))
-        total_fitness_per_player_type=[[] for i in range(len(previous_state[0]))]
+        for i in range(number_groups):
+            p, avg_p = self.calculate_payoffs(previous_state[i])
+            payoff.append(p)
+            avg_payoffs.append(avg_p)
+            fitness.append(self.calculate_fitnesses(payoff[i], self.selection_strengthI))
+    
+        total_fitness_per_player_type = [[] for i in range(len(previous_state[0]))] # This length could be written better.
         for i in range(len(previous_state[0])):
             for j in range(len(previous_state)):
                 for k in range(len(fitness[j][i])):
@@ -38,27 +43,31 @@ class Moran(DynamicsSimulator):
                         
         # Moran at the group level            
         if group_selection and np.random.uniform(0,1)<rate:
-            avg_payoffs=[]
-            for k in range(number_groups):
-                avg_payoffs.append(sum(chain(*fitness[k]))/sum(sum(chain(*fitness[j])) for j in range(number_groups)))
+            
+            avg_fitness = []
+            
+            # Calculate the fitness of each group based on their average payoffs
+            for k in range(len(avg_payoffs)):
+                avg_fitness.append(self.fitness_func(avg_payoffs[k], self.selection_strengthG))
                 
             # Pick the group that will reproduce and the one that it replaces
-            reproduction = np.random.multinomial(1,avg_payoffs)
+            reproduction = np.random.multinomial(1,[x / sum(avg_fitness) for x in avg_fitness])
             reproduction_index = np.nonzero(reproduction)[0][0]
-            replacement_event=np.random.randint(0,number_groups)
-            next_state[replacement_event]=next_state[reproduction_index]
+            replacement_event = np.random.randint(0,number_groups)
+            next_state[replacement_event] = next_state[reproduction_index]
         else:
+            
             # Moran at individual level where one individual from all the groups is chosen to reproduce proportional to it's fitness
-            group=[]
-            strategy=[]
+            group = []
+            strategy = []
                
             # For each player-type pick one individual from one group to reproduce
             for i in range(len(total_fitness_per_player_type)):
-                weighted_total=sum(total_fitness_per_player_type[i])
+                weighted_total = sum(total_fitness_per_player_type[i])
                 dist = np.array([f_i/weighted_total for f_i in total_fitness_per_player_type[i]])
                 sample = np.random.multinomial(1,dist)
-                reproduce_index=np.nonzero(sample)[0][0]
-                player_strat= len(total_fitness_per_player_type[i])/number_groups
+                reproduce_index = np.nonzero(sample)[0][0]
+                player_strat = len(total_fitness_per_player_type[i])/number_groups
                 group.append(int(reproduce_index/player_strat))
                 strategy.append(int(reproduce_index%player_strat))
                    
@@ -75,7 +84,7 @@ class Moran(DynamicsSimulator):
                     strat_no = np.random.randint(0,len(p))
                 p[strat_no] += 1
                 p -= np.random.multinomial(1, dist)
-            next_state[group_no][player_no]=p  
+            next_state[group_no][player_no] = p  
                
         # TO DO: Variable iterations per time step   
         

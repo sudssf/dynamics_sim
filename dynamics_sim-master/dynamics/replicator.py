@@ -18,9 +18,14 @@ class Replicator(DynamicsSimulator):
     def next_generation(self, previous_state, group_selection, rate):
         next_state = []
         number_groups=len(previous_state)
+        payoff = []
+        avg_payoffs = []
         fitness = []
-        for i in range(len(previous_state)):
-            fitness.append(self.calculate_fitnesses(previous_state[i]))
+        for i in range(number_groups):
+            p, avg_p = self.calculate_payoffs(previous_state[i])
+            payoff.append(p)
+            avg_payoffs.append(avg_p)
+            fitness.append(self.calculate_fitnesses(payoff[i], self.selection_strengthI))
             
         for i in range(number_groups):
             new_group_state =[]

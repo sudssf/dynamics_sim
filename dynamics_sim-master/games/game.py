@@ -25,7 +25,7 @@ class Game(object):
     EQUILIBRIA_LABELS = ()  #: a list of labels corresponding to the integers returned by the classify function
 
 
-    def __init__(self, payoff_matrices, player_frequencies, bias_strength, equilibrium_tolerance=0.1):
+    def __init__(self, payoff_matrices, player_frequencies, bias_strength = 0, bias_scale = 0, equilibrium_tolerance=0.1):
         """
         Initializes the game class with the give list of payoff matrices and distribution of players, as well as
         a notion of the equilibrium tolerance.
@@ -34,8 +34,12 @@ class Game(object):
         @type payoff_matrices: list
         @param player_frequencies: a list that describes the distribution of players by player type, must sum to 1
         @type player_frequencies: list or tuple
+        @param bias_strength: Relative strength of conformity versus individual selection
+        @type bias_strength: float between 0 and 1
+        @param bias_scale: The payoff associated with conformity, it can be thought of as the payoff associated with a coordination game.
+        @type bias_scale: float
         @param equilibrium_tolerance: the flexibility that should be used for equilibrium classification. An
-            equilibrium is classified as such if 1 - equlibrium_tolerance proportion of people are playing a given
+            equilibrium is classified as such if 1 - equilibrium_tolerance proportion of people are playing a given
             set of strategies
         @type equilibrium_tolerance: float
         """
@@ -44,7 +48,7 @@ class Game(object):
         if self.PLAYER_LABELS is not None:
             assert len(player_frequencies) == len(self.PLAYER_LABELS)
 
-        self.pm = PayoffMatrix(len(player_frequencies), payoff_matrices, bias_strength)
+        self.pm = PayoffMatrix(len(player_frequencies), payoff_matrices, bias_strength, bias_scale)
         if self.STRATEGY_LABELS is not None:
             for labels_i, num_strats  in zip(self.STRATEGY_LABELS, self.pm.num_strats):
                 assert len(labels_i) == num_strats
@@ -242,14 +246,14 @@ class Game(object):
         #par_for()(delayed(do_work)() for _ in range(multiprocessing.cpu_count()))
 
 
-# common case is n =2, but we support as big N as needed...This is not very clear, well-defined...CHANGE
+# common case is n = 2, but we support as big N as needed...This is not very clear, well-defined...CHANGE
 # Why is this even needed as a subclass?
 class SymmetricNPlayerGame(Game):
     """
     A convenience class that provides the logic for an N player game where each player chooses the from the same strategy
     set.
     """
-    def __init__(self, payoff_matrix, n, bias_strength, equilibrium_tolerance=0.1):
+    def __init__(self, payoff_matrix, n, bias_strength = 0, bias_scale = 0, equilibrium_tolerance=0.1):
         """
         Initialize the symmetric game with the given payoff matrix and number of players
 
@@ -268,7 +272,7 @@ class SymmetricNPlayerGame(Game):
         payoff_matrix_2 = tuple(map(tuple, zip(*payoff_matrix))) # transpose
         matrices = [payoff_matrix,payoff_matrix_2] # Payoff Matrix 2 doesn't really do anything here. CHANGE
         player_dist = (1, ) # Works only for n=1 player type
-        super(SymmetricNPlayerGame, self).__init__(payoff_matrices=matrices, player_frequencies=player_dist, bias_strength=bias_strength, equilibrium_tolerance=equilibrium_tolerance)
+        super(SymmetricNPlayerGame, self).__init__(payoff_matrices=matrices, player_frequencies=player_dist, bias_strength=bias_strength, bias_scale = bias_scale, equilibrium_tolerance=equilibrium_tolerance)
 
 
 

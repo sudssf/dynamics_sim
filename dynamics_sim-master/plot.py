@@ -88,11 +88,11 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
 
     graph_options = _append_options(graph_options)
 
-    fontsize = 30
+    fontsize = 20
     if 'smallFont' in graph_options or 'smallfont' in graph_options:
         fontsize = 18
     elif 'largeFont' in graph_options or 'largefont' in graph_options:
-        fontsize = 36
+        fontsize = 30
 
 
     #Determine coloration
@@ -201,16 +201,17 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
                 graphColoredLines(graph_options['colorLineArray'][i], plt, colors)
             if 'textList' in graph_options:
                 plotText(graph_options['textList'], plt, fontsize=fontsize)
-            fig.savefig('%s.png'%labels[0])
+            # Option to save figure as a png file
+            #fig.savefig('%s.png'%labels[0]) 
 
     plt.show()
     
 def plot_contour_data_set(data, y_label, y_values, x_label, x_values, z_label, title, num_categories, graph_options=None):
-    fontsize = 30
+    fontsize = 20
     if 'smallFont' in graph_options or 'smallfont' in graph_options:
         fontsize = 18
     elif 'largeFont' in graph_options or 'largefont' in graph_options:
-        fontsize = 36
+        fontsize = 30
 
     # Note it seems as though the x and y values are switched for contour plots
     
@@ -225,6 +226,7 @@ def plot_contour_data_set(data, y_label, y_values, x_label, x_values, z_label, t
     
     # iterate over all the generations
     num_xs, num_ys, n_cats = data.shape
+
     assert num_categories == n_cats
     
     # Iterate over all categories
@@ -239,7 +241,7 @@ def plot_contour_data_set(data, y_label, y_values, x_label, x_values, z_label, t
     else:
         rootX = root
     
-    fig, axs = plt.subplots(rootX, root)
+    fig, axs = plt.subplots(rootX, root, figsize = ((rootX*4)+8,rootX*4))
     ax = axs.ravel()
     for cat_i in range(n_cats):
         cs = ax[cat_i].contourf(x_values, y_values, data[:, :, cat_i], levels, colors=colors)
@@ -251,7 +253,7 @@ def plot_contour_data_set(data, y_label, y_values, x_label, x_values, z_label, t
 
         if 'lineArray' in graph_options:
             graphLines(graph_options['lineArray'], ax[cat_i])
-
+    plt.tight_layout()
     plt.show()
 
 
@@ -261,7 +263,7 @@ def plot_3d_data_set(data, x_label, x_values, y_label, y_values, z_label, title,
     colors = graph_options[GraphOptions.COLORS_KEY]
     category_labels = graph_options[GraphOptions.LEGEND_LABELS_KEY]
     plt.close('all')
-    fig = plt.figure()
+    fig = plt.figure(figsize=(10,7))
 
     # iterate over all the generations
     num_xs, num_ys, n_cats = data.shape
@@ -286,15 +288,15 @@ def plot_3d_data_set(data, x_label, x_values, y_label, y_values, z_label, title,
         ax.set_ylabel(y_label)
         zs = data[:, :, cat_i]
         ax.set_title(category_labels(cat_i))
-        ax.plot_wireframe(xs, ys, zs, color=colors[cat_i % n_cats])#3d Visualization
+        ax.plot_wireframe(xs, ys, zs, color=colors[cat_i % n_cats],linewidth=0.7)#3d Visualization
 
-    fig2 = plt.figure()
+    fig2 = plt.figure(figsize=(8,5))
     ax = fig2.add_subplot(1, 1, 1, projection='3d')
     # plot_wireframe
     # TODO: plot surface seems to look better, except it doesn't play nicely with multiple surfaces on the same graph
     for cat_i in range(n_cats):
         zs = data[:, :, cat_i]
-        ax.plot_wireframe(xs, ys, zs, color=colors[cat_i % n_cats])
+        ax.plot_wireframe(xs, ys, zs, color=colors[cat_i % n_cats],linewidth=0.7)
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)    
     

@@ -1,30 +1,40 @@
 __author__ = 'eblubin@mit.edu'
 import numpy as np
 from dynamics.dynamics import DynamicsSimulator
-from itertools import chain
 
 
 class WrightFisher(DynamicsSimulator):
-    def __init__(self, mu=0.05, *args, **kwargs):
+    def __init__(self, mu=0.0, *args, **kwargs):
         # TODO don't allow pop_size of 0, wright fisher only works with finite pop size
         super(WrightFisher, self).__init__(*args,stochastic=True,**kwargs)
         self.mu = mu
 
     def next_generation(self, previous_state, group_selection, rate):
+        
         next_state = []
         number_groups=len(previous_state)
+        payoff = []
+        avg_payoffs = []
         fitness = []
-        for i in range(len(previous_state)):
-            fitness.append(self.calculate_fitnesses(previous_state[i]))
-            
-        # Wright-Fisher between groups           
+        for i in range(number_groups):
+            p, avg_p = self.calculate_payoffs(previous_state[i])
+            payoff.append(p)
+            avg_payoffs.append(avg_p)
+            fitness.append(self.calculate_fitnesses(payoff[i], self.selection_strengthI))
+        
+        # Wright-Fisher between groups  
+         
         if group_selection and np.random.uniform(0,1)<rate:
-            avg_payoffs=[]
-            for k in range(number_groups):
-                avg_payoffs.append(sum(chain(*fitness[k]))/sum(sum(chain(*fitness[j])) for j in range(number_groups)))
-                
+    
+            avg_fitness = []
+            
+            # Calculate the fitness of each group based on their average payoffs
+            for k in range(len(avg_payoffs)):
+                avg_fitness.append(self.fitness_func(avg_payoffs[k], self.selection_strengthG))
             # Groups reproduce proportional to their fitness
-            new_group_distribution = np.random.multinomial(number_groups,avg_payoffs)
+            
+            new_group_distribution = np.random.multinomial(number_groups,[x / sum(avg_fitness) for x in avg_fitness])
+
                 
             # Update the new distribution of groups
             for idx, group_freq in enumerate(new_group_distribution):
@@ -65,6 +75,6 @@ class WrightFisher(DynamicsSimulator):
                     new_player_state += np.random.multinomial(total_mutations, [1. / num_strats] * num_strats)
                     new_group_state.append(new_player_state)
                 next_state.append(new_group_state)
-
+        
         return next_state, fitness
 

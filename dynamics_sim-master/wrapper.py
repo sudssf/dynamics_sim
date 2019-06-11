@@ -33,7 +33,6 @@ class GameDynamicsWrapper(object):
         self.game_kwargs = game_cls.DEFAULT_PARAMS
         if game_kwargs is not None:
             self.game_kwargs.update(game_kwargs)
-
         if dynamics_kwargs is None:
             dynamics_kwargs = {}
         self.game_cls = game_cls
@@ -84,7 +83,7 @@ class GameDynamicsWrapper(object):
         @type return_labeled: bool
         @return: the frequency of time spent in each equilibria, defined by the game
         @rtype: numpy.ndarray or dict
-        TO DO: Unclear why Andrew introduced this 'burn' variable. Might be best to get rid of it.
+        TO DO: Explain what 'burn' does
         """
         game = self.game_cls(**self.game_kwargs)
         dyn = self.dynamics_cls(payoff_matrix=game.pm,
@@ -93,19 +92,32 @@ class GameDynamicsWrapper(object):
         
         # Group Selection simulation for a given number of generations.
         results_total,payoffs_total=dyn.simulate(num_gens,start_state)
-
+        
         # Classify the equilibria and plot the results
         params = Obj(**self.game_kwargs)
+        
         frequencies = np.zeros(self.game_cls.num_equilibria())  # one extra for the Unclassified key
         if dyn.stochastic:
             classifications = []
-            # Classify every generation
-            for state in zip(*results_total):
-                state = [x / x.sum() for x in state]
-                equi = game.classify(params, state, game.equilibrium_tolerance)
-                # note, if equi returns -1, then the -1 index gets the last entry in the array
-                classifications.append(equi)
-                frequencies[equi] += 1
+
+            if class_end:  # Only classify the final generation
+                lastGenerationState = [np.zeros(len(player[0])) for player in results_total]
+                for playerIdx, player in enumerate(results_total):
+                    for stratIdx, strat in enumerate(player[-1]):
+                        lastGenerationState[playerIdx][stratIdx] = strat
+                    lastGenerationState[playerIdx] /= lastGenerationState[playerIdx].sum()
+                equi = game.classify(params, lastGenerationState, game.equilibrium_tolerance)
+                frequencies = np.zeros(self.game_cls.num_equilibria())
+                frequencies[equi] = 1
+
+            else: # Classify every generation
+            
+                for state in zip(*results_total):
+                    state = [x / x.sum() for x in state]
+                    equi = game.classify(params, state, game.equilibrium_tolerance)
+                    # note, if equi returns -1, then the -1 index gets the last entry in the array
+                    classifications.append(equi)
+                    frequencies[equi] += 1
         else:
             last_generation_state = results_total[-1]
             classification = game.classify(params, last_generation_state, game.equilibrium_tolerance)
@@ -121,7 +133,7 @@ class GameDynamicsWrapper(object):
             
     # Add ways to plot the evolution of strategies in a single group?
         
-    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, pop_size=100, start_state=None, graph=False, return_labeled=True, burn=0, parallelize=True, class_end=False):
+    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, pop_size=100, start_state=None, graph=False, return_labeled=True, burn=0, parallelize=True, class_end=True):
         """
         A helper method to call the simulate methods num_iterations times simulating num_gens generations each time,
         and then averaging the frequency of the resulting equilibria. Method calls are parallelized and attempt to
@@ -171,10 +183,10 @@ class GameDynamicsWrapper(object):
                     gen /= gen.sum()
                     gen *= dyn.num_players[playerIdx]
 
-        payoffsAvg = [np.zeros(shape=(num_gens - 1, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
+        payoffsAvg = [np.zeros(shape=(num_gens -1, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
         for iteration in range(num_iterations):
             for player in range(dyn.pm.num_player_types):
-                for gen in range(num_gens - 1 - burn):
+                for gen in range(num_gens -1 - burn):
                     for strat in range(dyn.pm.num_strats[player]):
                         payoffsAvg[player][gen][strat] += payoffs[iteration][player][gen][strat]
 
@@ -269,7 +281,7 @@ class DependentParameter(object):
         """
         Each dependent parameter can be a function of both the values of all the other parameters, as well as,
         any other inputs. Due to the fact that in order to parallelize we need to be able to pickle all the arguments,
-        the lambda function is easier to pickle without any closurs. As a result the lambda cannot reference any
+        the lambda function is easier to pickle without any closure. As a result the lambda cannot reference any
         external variables, besides those passed in as arguments.
 
         @param func: the function mapping fixed parameters to the value that this dependent paramter should take on

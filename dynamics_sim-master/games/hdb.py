@@ -5,9 +5,9 @@ class HawkDoveBourgeois(SymmetricNPlayerGame):
     """
     A class used to to represent the 2 player hawk-dove-bourgeois game. See U{http://www.life.umd.edu/classroom/zool360/L18-ESS/ess.html}
     """
-    DEFAULT_PARAMS = dict(v=30, c=100, bias_strength=0)
+    DEFAULT_PARAMS = dict(v=30, c=60, bias_strength=0)
     STRATEGY_LABELS = ('Hawk', 'Dove', 'Bourgeois')
-    EQUILIBRIA_LABELS = ('Bourgeois','Hawk Dove','Dove','Dove Bourgeois')
+    EQUILIBRIA_LABELS = ('Hawk Dove','Bourgeois Bourgeois')
 
     def __init__(self, v, c, bias_strength):
         payoff_matrix = (((v - c) / 2, v, 3 * v / 4 - c / 4),
@@ -20,13 +20,9 @@ class HawkDoveBourgeois(SymmetricNPlayerGame):
     def classify(cls, params, state, tolerance):
         threshold = 1 - tolerance
         
-        if state[0][2] >= threshold:
-            return 0#Bourgeois Bourgeois
-        elif state[0][1] >= threshold:
-            return 2#Dove
-        elif state[0][1]+state[0][2] >= threshold:
-            return 3#Dove Bourgeois
-        elif state[0][1]+state[0][0] >= threshold:
-            return 1#Hawk Dove
+        if state[0][0]+state[0][1] >= threshold:
+            return 0#Hawk Dove
+        elif state[0][2] >= threshold:
+            return 1#Bourgeois Bourgeois
         else:
             return super(HawkDoveBourgeois, cls).classify(params, state, tolerance)

@@ -135,6 +135,13 @@ class TwoDimensionalData(NDimensionalData):
         x_values = list(x)
         n_equilibria = len(equilibria)
         data = numpy.array(self.data)
+
+        # Don’t include the unclassified equilibrium if it’s proportion is zero
+        if not data[:,-1].all():
+           n_equilibria = n_equilibria-1
+           data = data[:,:-1]
+        
+        # Plot the 2D data
         plot_single_data_set(data, x.key, x_values,
                              "Equilibrium Proportion",
                              "%s:(%.3f ... %.3f)" % (x.key, x.lb, x.ub),
@@ -160,8 +167,27 @@ class ThreeDimensionalData(NDimensionalData):
             for j in range(ny):
                 data[i, j, :] = self.data[i][j]
 
+        
+        # Don’t include the unclassified equilibrium if it’s proportion is always zero (i.e. unclassified takes the value False)
+        unclassified = False
+        for i in range(len(data)):
+            for j in range (len(data[i])):
+                if data[i][j][-1]==0.0:
+                    unclassified = unclassified or False
+                else:
+                    unclassified = unclassified or True
+
+        if not unclassified:
+           n_equilibria = n_equilibria - 1
+           final_data = numpy.zeros((nx, ny, n_equilibria))
+           for i in range(nx):
+               for j in range(ny):
+                   final_data[i, j, :] = data[i][j][:-1]
+        else:
+            final_data = data
+
         if graph_options['type'] == '3d':
-            plot_3d_data_set(data, x.key, x_values, y.key, y_values,
+            plot_3d_data_set(final_data, x.key, x_values, y.key, y_values,
                          "Equilibrium Proportion", "%s:(%.3f ... %.3f), %s:(%.3f ... %.3f) " % (x.key,
                                                                                                 x.lb,
                                                                                                 x.ub,
@@ -170,7 +196,7 @@ class ThreeDimensionalData(NDimensionalData):
                                                                                                 y.ub),
                          n_equilibria, graph_options)
         elif graph_options['type'] == 'contour':
-            plot_contour_data_set(data, x.key, x_values, y.key, y_values,
+            plot_contour_data_set(final_data, x.key, x_values, y.key, y_values,
                          "Equilibrium Proportion", "%s:(%.3f ... %.3f), %s:(%.3f ... %.3f) " % (x.key,
                                                                                                 x.lb,
                                                                                                 x.ub,
