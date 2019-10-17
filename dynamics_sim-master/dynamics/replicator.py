@@ -9,8 +9,9 @@ class Replicator(DynamicsSimulator):
         """
         The constructor for the Replicator dynamics process, that the number of births/deaths to precess per time step.
         
-        @param num_iterations_per_time_step: the number of iterations of the process we do per time step
-        @type num_iterations_per_time_step: int
+        @param generation_skip: to be interpreted as the number of time-steps included in each simulated generation. The larger it is the faster the dynamics.
+        @type generation_skip: float
+
         """
         super(Replicator, self).__init__(*args,stochastic=False,**kwargs)
         self.generation_skip = generation_skip
@@ -34,7 +35,7 @@ class Replicator(DynamicsSimulator):
             
                 new_player_state = np.zeros(len(fitnesses))
                 for stratIndex, (stratFitness, stratProportion) in enumerate(zip(fitnesses, stratDistribution)):
-                    dStrat = stratProportion * (stratFitness - meanFitness) / self.generation_skip
+                    dStrat = stratProportion * (stratFitness - meanFitness) * self.generation_skip
                     new_player_state[stratIndex] = stratProportion + dStrat
                 
                 for i, strat in enumerate(new_player_state):
@@ -42,7 +43,7 @@ class Replicator(DynamicsSimulator):
                         new_player_state[i] = 0
                 if new_player_state.sum() <= 0:
                     for i in range(len(new_player_state)):
-                        new_player_state[i] = 1#Normalization in edge cases (to prevent negative distributions or all 0 distributions
+                        new_player_state[i] = 1#Normalization in edge cases (to prevent negative distributions or all 0 distributions)
                     
                 new_player_state *= float(numPlayers / new_player_state.sum())
                 new_player_state = np.array(self.round_individuals(new_player_state))
