@@ -5,6 +5,11 @@ from dynamics.dynamics import DynamicsSimulator
 
 class WrightFisher(DynamicsSimulator):
     def __init__(self, mu=0.0, *args, **kwargs):
+        """
+        @param mu: mutation rate
+        @type mu: float
+        """
+
         # TODO don't allow pop_size of 0, wright fisher only works with finite pop size
         super(WrightFisher, self).__init__(*args,stochastic=True,**kwargs)
         self.mu = mu
