@@ -6,17 +6,17 @@ class Moran(DynamicsSimulator):
     A stochastic dynamics simulator that performs the Moran process on all player types in the population.
     See U{Moran Process<http://en.wikipedia.org/wiki/Moran_process#Selection>}
     """
-    def __init__(self, num_iterations_per_time_step=1,*args, **kwargs):
+    def __init__(self, mu =0.0, *args, **kwargs):
         """
         The constructor for the Moran dynamics process, that the number of births/deaths to process per time step.
         Mutations are incorporated at the individual level for now.
-        @param num_iterations_per_time_step: the number of iterations of the Moran process we do per time step
-        @type num_iterations_per_time_step: int
+        # TO DO: Variable iterations per time step
+        @param mu: mutation rate
+        @type mu: float
         """
         super(Moran, self).__init__(*args,stochastic=True,**kwargs)
-        assert num_iterations_per_time_step >= 1
-        self.num_iterations_per_time_step = num_iterations_per_time_step
-        self.mu=0.0
+
+        self.mu=mu
 
     def next_generation(self, previous_state, group_selection, rate):
         next_state = []
@@ -86,7 +86,7 @@ class Moran(DynamicsSimulator):
                 p -= np.random.multinomial(1, dist)
             next_state[group_no][player_no] = p  
                
-        # TO DO: Variable iterations per time step   
+           
         
         return next_state, fitness
         
