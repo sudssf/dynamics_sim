@@ -250,7 +250,7 @@ class Game(object):
 # Why is this even needed as a subclass?
 class SymmetricNPlayerGame(Game):
     """
-    A convenience class that provides the logic for an N player game where each player chooses the from the same strategy
+    A convenience class that provides the logic for an N player game where each player chooses from the same strategy
     set.
     """
     def __init__(self, payoff_matrix, n, bias_strength = 0, bias_scale = 0, equilibrium_tolerance=0.1):

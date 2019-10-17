@@ -81,6 +81,8 @@ class GameDynamicsWrapper(object):
         @param return_labeled: whether the distribution of classified equilibria that are returned should be labelled
             or simply listed with their keys inferred by their order
         @type return_labeled: bool
+        @param class_end: if False the equilibria are classified at all generations and if True only the last generation is classified.
+        @type class_end: bool
         @return: the frequency of time spent in each equilibria, defined by the game
         @rtype: numpy.ndarray or dict
         TO DO: Explain what 'burn' does
@@ -149,6 +151,8 @@ class GameDynamicsWrapper(object):
         @param parallelize: whether or not to parallelize the computation, defaults to true, but an override when
             varying the parameters, as seen in the L{VariedGame} class to achieve coarser parallelization
         @type parallelize: bool
+        @param class_end: if False the equilibria are classified at all generations and if True only the last generation is classified.
+        @type class_end: bool
         @return: the frequency of time spent in each equilibria, defined by the game
         @rtype: np.ndarray or dict
         """
