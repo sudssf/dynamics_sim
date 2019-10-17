@@ -1,7 +1,7 @@
 from plot import plot_data_for_players, GraphOptions
 from results import NDimensionalData
 import inspect
-import numpy
+import numpy as np
 import types
 import marshal
 from parallel import par_for, delayed, wrapper_simulate, wrapper_vary_for_kwargs
@@ -28,20 +28,21 @@ class GameDynamicsWrapper(object):
         @type game_kwargs: dict
         @param dynamics_kwargs: any keyword arguments that will be passed to the dynamics class on initialization
         @type dynamics_kwargs: dict
+
         """
         self.game_kwargs = game_cls.DEFAULT_PARAMS
         if game_kwargs is not None:
             self.game_kwargs.update(game_kwargs)
-
         if dynamics_kwargs is None:
             dynamics_kwargs = {}
         self.game_cls = game_cls
         self.dynamics_cls = dynamics_cls
         self.dynamics_kwargs = dynamics_kwargs
 
+
     def update_game_kwargs(self, *args, **kwargs):
         """
-        Update the default values of the arguments to the game constructor.
+        Update the default values of the arguments to the game constructor for a VariedGame.
         @param args: dictionary(s) to update the values with
         @type args: dict
         @param kwargs: keys of the dictionary to update.
@@ -50,7 +51,7 @@ class GameDynamicsWrapper(object):
 
     def update_dynamics_kwargs(self, *args, **kwargs):
         """
-        Update the default values of the arguments to the dynamics constructor.
+        Update the default values of the arguments to the dynamics constructor for a VariedGame.
         @param args: dictionary(s) to update the values with
         @type args: dict
         @param kwargs: keys of the dictionary to update.
@@ -60,77 +61,81 @@ class GameDynamicsWrapper(object):
     def stationaryDistribution(self):
         pass
 
-    def simulate(self, num_gens=DEFAULT_GENERATIONS, graph=True, burn=0, return_labeled=True, start_state=None, class_end=False):
-        """
-        Simulate the game for the given number of generations with the specified dynamics class and optionally graph the results
 
+            
+    def simulate(self, num_gens=DEFAULT_GENERATIONS, pop_size=100, start_state=None, graph=True, return_labeled=True, burn=0, class_end=False):
+        """
+        Simulate a game in the presence of group selection for a specific number of generations optionally
+        graphing the results
+        
         @param num_gens: the number of iterations of the simulation.
         @type num_gens: int
+        @param group_size: Fixed population in each group.
+        @type group_size: int
+        @param rate: Rate of group selection vs individual selection
+        @type rate: float
+        @param start_state: whether the starting state is to be predetermined
+        @type start_state: list
         @param graph: the type of graph (false if no graph is wished)
         @type graph: dict, bool
         @param return_labeled: whether the distribution of classified equilibria that are returned should be labelled
             or simply listed with their keys inferred by their order
         @type return_labeled: bool
-        @param start_state: whether the starting state is to be predeterined
-        @type start_state: list
-        @param graph_payoffs: to graph the payoffs for each generation
-        @type graph_payoffs: bool
-        @param graph_payoff_line: to show the dominate strategy for each generation of the game underneath the graph
-        @type graph_payoff_line: bool
+        @param class_end: if False the equilibria are classified at all generations and if True only the last generation is classified.
+        @type class_end: bool
         @return: the frequency of time spent in each equilibria, defined by the game
         @rtype: numpy.ndarray or dict
+        TO DO: Explain what 'burn' does
         """
         game = self.game_cls(**self.game_kwargs)
         dyn = self.dynamics_cls(payoff_matrix=game.pm,
-                                player_frequencies=game.player_frequencies,
+                                player_frequencies=game.player_frequencies,pop_size=pop_size,
                                 **self.dynamics_kwargs)
-        results, payoffs = dyn.simulate(num_gens=num_gens, debug_state=start_state)
-
-        # results_obj = SingleSimulationOutcome(self.dynamics_cls, self.dynamics_kwargs, self.game_cls, self.game_kwargs, results)
-        # TODO: serialize results to file
+        
+        # Group Selection simulation for a given number of generations.
+        results_total,payoffs_total=dyn.simulate(num_gens,start_state)
+        
+        # Classify the equilibria and plot the results
         params = Obj(**self.game_kwargs)
-        frequencies = numpy.zeros(self.game_cls.num_equilibria())  # one extra for the Unclassified key
-
-        for playerIdx, player in enumerate(payoffs):
-            payoffs[playerIdx] = numpy.delete(player, (0), axis=0)
-
-        if burn:
-            for index, array in enumerate(results):
-                results[index] = array[burn:]
-
+        
+        frequencies = np.zeros(self.game_cls.num_equilibria())  # one extra for the Unclassified key
         if dyn.stochastic:
             classifications = []
+
             if class_end:  # Only classify the final generation
-                lastGenerationState = [numpy.zeros(len(player[0])) for player in results]
-                for playerIdx, player in enumerate(results):
+                lastGenerationState = [np.zeros(len(player[0])) for player in results_total]
+                for playerIdx, player in enumerate(results_total):
                     for stratIdx, strat in enumerate(player[-1]):
                         lastGenerationState[playerIdx][stratIdx] = strat
                     lastGenerationState[playerIdx] /= lastGenerationState[playerIdx].sum()
                 equi = game.classify(params, lastGenerationState, game.equilibrium_tolerance)
-                frequencies = numpy.zeros(self.game_cls.num_equilibria())
+                frequencies = np.zeros(self.game_cls.num_equilibria())
                 frequencies[equi] = 1
-            else:  # Classify every generation
-                for state in zip(*results):
+
+            else: # Classify every generation
+            
+                for state in zip(*results_total):
                     state = [x / x.sum() for x in state]
                     equi = game.classify(params, state, game.equilibrium_tolerance)
                     # note, if equi returns -1, then the -1 index gets the last entry in the array
                     classifications.append(equi)
                     frequencies[equi] += 1
         else:
-            last_generation_state = results[-1]
+            last_generation_state = results_total[-1]
             classification = game.classify(params, last_generation_state, game.equilibrium_tolerance)
             frequencies[classification] = 1
-
+        
         if graph:
-            setupGraph(graph, game, dyn, burn, num_gens, results, payoffs)
+            setupGraph(graph, game, dyn, burn, num_gens, results_total, payoffs_total)
         else:
             if return_labeled:
                 return self._convert_equilibria_frequencies(frequencies)
             else:
-                return frequencies, results, payoffs
-
-
-    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, return_labeled=True, burn=0, parallelize=True, graph=False, start_state=None, class_end=False):
+                return frequencies, results_total, payoffs_total
+            
+    # Add ways to plot the evolution of strategies in a single group?
+        
+    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, pop_size=100, start_state=None, graph=False, return_labeled=True, burn=0, parallelize=True, class_end=True):
         """
         A helper method to call the simulate methods num_iterations times simulating num_gens generations each time,
         and then averaging the frequency of the resulting equilibria. Method calls are parallelized and attempt to
@@ -138,7 +143,7 @@ class GameDynamicsWrapper(object):
 
         @param num_iterations: the number of times to iterate the simulation
         @type num_iterations: int
-        @param num_gens: the number of generations to run each simulation witu
+        @param num_gens: the number of generations to run each simulation with
         @type num_gens: int
         @param return_labeled: whether the distribution of classified equilibria that are returned should be labelled
             or simply listed with their keys inferred by their order
@@ -146,16 +151,19 @@ class GameDynamicsWrapper(object):
         @param parallelize: whether or not to parallelize the computation, defaults to true, but an override when
             varying the parameters, as seen in the L{VariedGame} class to achieve coarser parallelization
         @type parallelize: bool
+        @param class_end: if False the equilibria are classified at all generations and if True only the last generation is classified.
+        @type class_end: bool
         @return: the frequency of time spent in each equilibria, defined by the game
-        @rtype: numpy.ndarray or dict
+        @rtype: np.ndarray or dict
         """
         # TODO move this graphing into graphSetup and link it to extra options
+        
         game = self.game_cls(**self.game_kwargs)
         dyn = self.dynamics_cls(payoff_matrix=game.pm,
-                                player_frequencies=game.player_frequencies,
+                                player_frequencies=game.player_frequencies,pop_size=pop_size,
                                 **self.dynamics_kwargs)
-        frequencies = numpy.zeros(self.game_cls.num_equilibria())
-        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, burn=burn, start_state=start_state, class_end=class_end) for iteration in range(num_iterations))
+        frequencies = np.zeros(self.game_cls.num_equilibria())
+        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, pop_size=pop_size, start_state=start_state, burn=burn, class_end=class_end) for iteration in range(num_iterations))
 
         equilibria = []
         strategies = [0]*num_iterations
@@ -166,7 +174,7 @@ class GameDynamicsWrapper(object):
             payoffs[idx] = sim[2]
 
         #TODO move these averages or only compile them if appropriate simulation type
-        stratAvg = [numpy.zeros(shape=(num_gens, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
+        stratAvg = [np.zeros(shape=(num_gens, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
         for iteration in range(num_iterations):
             for player in range(dyn.pm.num_player_types):
                 for gen in range(num_gens - burn):
@@ -179,10 +187,10 @@ class GameDynamicsWrapper(object):
                     gen /= gen.sum()
                     gen *= dyn.num_players[playerIdx]
 
-        payoffsAvg = [numpy.zeros(shape=(num_gens - 1, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
+        payoffsAvg = [np.zeros(shape=(num_gens -1, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
         for iteration in range(num_iterations):
             for player in range(dyn.pm.num_player_types):
-                for gen in range(num_gens - 1 - burn):
+                for gen in range(num_gens -1 - burn):
                     for strat in range(dyn.pm.num_strats[player]):
                         payoffsAvg[player][gen][strat] += payoffs[iteration][player][gen][strat]
 
@@ -204,7 +212,7 @@ class GameDynamicsWrapper(object):
             return self._convert_equilibria_frequencies(frequencies)
         else:
             return frequencies
-
+    
     @staticmethod
     def _static_convert_equilibria_frequencies(game_cls, frequencies):
         labels = game_cls.get_equilibria()
@@ -262,7 +270,7 @@ class VerboseIndependentParameter(IndependentParameter):
         - Whether or not the parameter is direct or indirect (indirect may be used as params to dependent params, but don't directly get applied to the class constructor)
         - Whether the parameter is for the dynamics or the class constructor
     """
-    def __init__(self, key, is_direct, is_game_kwarg, *args, **kwargs):
+    def __init__(self, key, is_game_kwarg, is_direct, *args, **kwargs):
         self.key = key
         self.is_direct = is_direct
         self.is_game_kwarg = is_game_kwarg
@@ -277,7 +285,7 @@ class DependentParameter(object):
         """
         Each dependent parameter can be a function of both the values of all the other parameters, as well as,
         any other inputs. Due to the fact that in order to parallelize we need to be able to pickle all the arguments,
-        the lambda function is easier to pickle without any closurs. As a result the lambda cannot reference any
+        the lambda function is easier to pickle without any closure. As a result the lambda cannot reference any
         external variables, besides those passed in as arguments.
 
         @param func: the function mapping fixed parameters to the value that this dependent paramter should take on
@@ -302,10 +310,9 @@ class DependentParameter(object):
     def __setstate__(self, state):
         self.func = types.FunctionType(marshal.loads(state['func']), globals())
 
-
 class VariedGame(object):
     """
-    A class that wraps the L{GameDynamicsWrapper} class and simplifies the process of varying multiple parameteres
+    A class that wraps the L{GameDynamicsWrapper} class and simplifies the process of varying multiple parameters
     to the simulation at once, and then graphing the effect one or more parameters have on the resulting equilibrium
     distribution of repeated simulations.
     """
@@ -407,7 +414,7 @@ class VariedGame(object):
         assert not (game_kwargs is None and dynamics_kwargs is None), "nothing to vary!"
 
         kwargs = [game_kwargs, dynamics_kwargs]
-
+        
         for j, kw in enumerate(kwargs):
             if kw is None:
                 kwargs[j] = [{}, {}, {}]
@@ -435,7 +442,7 @@ class VariedGame(object):
                 for k in kw[j]:
                     v = kw[j][k]
                     assert len(v) == 3
-                    ip = VerboseIndependentParameter(k, j == 0, i == 0, *v)
+                    ip = VerboseIndependentParameter(k, i == 0, j == 0, *v)
                     kw[j][k] = ip
                     independent_params.append(ip)
             assert isinstance(kw[1], dict)
@@ -444,7 +451,7 @@ class VariedGame(object):
                 argspec = inspect.getargspec(v)
                 assert len(argspec.args) == 1
                 kw[1][k] = DependentParameter(v)
-
+       
         w = GameDynamicsWrapper(self.game_cls, self.dynamics_cls, self.game_kwargs, self.dynamics_kwargs)
 
         dependent_params = (kwargs[0][1], kwargs[1][1])
@@ -491,7 +498,6 @@ class VariedGame(object):
             independent parameter was set to its value at index 4 (@see IndependentParameter.__getitem__), and the second
             independent parameter was set to its value at index 17.
         """
-
         if idx == len(ips):
             # the list is divided as follows:
             # [[direct_game_kwargs, indirect_game_kwargs], [direct_dynamics_kwargs, indirect_dynamics_kwargs]]
@@ -499,7 +505,7 @@ class VariedGame(object):
 
             # helper function to return the correct keywords give the desired params
             def kws(ip):
-                return varied_kwargs[int(not ip.is_direct)][int(not ip.is_game_kwarg)]
+                return varied_kwargs[int(not ip.is_game_kwarg)][int(not ip.is_direct)]
 
             for chosen_idx, ip in zip(chosen_vals, ips):
                 kws(ip)[ip.key] = ip[chosen_idx]
@@ -507,7 +513,7 @@ class VariedGame(object):
             # the list is organized as follows:
             # [game_kwargs, dynamics_kwargs]
             sim_kwargs = [{}, {}]
-
+            
             for i in (0, 1):
                 # set all the direct ones
                 for k, v in varied_kwargs[i][0].items():
@@ -526,7 +532,7 @@ class VariedGame(object):
                     dependent_kw_params.update(varied_kwargs[i][1])
 
                     sim_kwargs[i][k] = dp.get_val(**dependent_kw_params)
-
+            
             sim_wrapper.update_dynamics_kwargs(sim_kwargs[1])
             sim_wrapper.update_game_kwargs(sim_kwargs[0])
             # don't parallellize the simulate_many requests, we are parallelizing higher up in the call chain
@@ -536,4 +542,6 @@ class VariedGame(object):
         #dependent_params = [{}, {}]
         return par_for(parallelize)(delayed(wrapper_vary_for_kwargs)(self, ips, idx + 1, dependent_params, sim_wrapper, chosen_vals + (i, ), **kwargs) for i in var_indices)    
 
-
+        
+        
+        

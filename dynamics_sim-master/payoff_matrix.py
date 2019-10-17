@@ -11,10 +11,11 @@ class PayoffMatrix(object):
     expected payoff given a distribution of players playing each strategy.
     """
 
-    def __init__(self, num_players, payoff_matrices, bias_strength):
+    def __init__(self, num_players, payoff_matrices, bias_strength, bias_scale):
         self.num_player_types = num_players
         self.payoff_matrices = payoff_matrices
         self.bias_strength = bias_strength
+        self.bias_scale = bias_scale
         self.num_strats = []
         root = self.payoff_matrices[0]
         for i in range(self.num_player_types):
@@ -60,7 +61,7 @@ class PayoffMatrix(object):
             matrix = matrix[idx]
         return matrix
 
-    def get_expected_payoff(self, player_idx, strategy, current_state, bias_func=None):
+    def get_expected_payoff(self, player_idx, strategy, current_state, bias_func = lambda f: f):
         """
         Get the expected payoff if the player at idx player_idx plays indexed by strategy given the current state. The user can define a function
         that encapsulates the notion of frequency dependent bias i.e. a function of the player_idx frequencies is added to the expected payoff.
@@ -72,18 +73,21 @@ class PayoffMatrix(object):
             frequency of players playing that strategy.
         @type current_state: list
         @param bias_function: User defined or default bias_function
-        @type bias_function: lambda that takes in two arguments, the frequency of a player type playing a strategy and the bias strength. Returns modification to the payoff
+        @type bias_function: lambda that takes in one argument, the frequency of a player type playing a strategy.
         @return: the expected payoff
         @rtype: float
         """
         current=numpy.asarray(current_state[player_idx])
         current_freq=current/sum(current)
         squared_sum=sum(current_freq**2)
-        # Defining the default function as developed by Nakahashi. This should be modified according to the nature of the fitness function being considered.
+
+        # Defining the default function as developed by Nakahashi with a=2. This should be modified according to the nature of the fitness function and the strength of the bias being considered.
+
         if bias_func is None:
-            bias_func=lambda freq, bias: ((freq**2/squared_sum)) * bias
-        self.bias_func=lambda freq:float(bias_func(freq,self.bias_strength))
-        biased_payoff=self._iterate_through_players(player_idx, 0, {player_idx: strategy}, 1.0, current_state)+self.bias_func(current_freq[strategy])
+            bias_func=lambda freq: ((freq**2/squared_sum))
+        self.bias_func=lambda freq:float(bias_func(freq))
+
+        biased_payoff=self._iterate_through_players(player_idx, 0, {player_idx: strategy}, 1.0, current_state)*(1-self.bias_strength) + self.bias_func(current_freq[strategy])*self.bias_strength*self.bias_scale
         return biased_payoff
     
     def _iterate_through_players(self, target_player_idx, current_player_idx, other_player_strategies, probability, current_state):

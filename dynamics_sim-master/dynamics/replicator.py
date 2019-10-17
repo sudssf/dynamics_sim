@@ -1,7 +1,7 @@
-from dynamics.dynamics import StochasticDynamicsSimulator
+from dynamics.dynamics import DynamicsSimulator
 import numpy as np
 
-class Replicator(StochasticDynamicsSimulator):
+class Replicator(DynamicsSimulator):
     """
     A stochastic dynamics simulator which performs replicator dynamics on all player types in the population.
     """
@@ -9,36 +9,46 @@ class Replicator(StochasticDynamicsSimulator):
         """
         The constructor for the Replicator dynamics process, that the number of births/deaths to precess per time step.
         
-        @param num_iterations_per_time_step: the number of iterations of the Moran process we do per time step
+        @param num_iterations_per_time_step: the number of iterations of the process we do per time step
         @type num_iterations_per_time_step: int
         """
-        super(Replicator, self).__init__(*args, **kwargs)
+        super(Replicator, self).__init__(*args,stochastic=False,**kwargs)
         self.generation_skip = generation_skip
         
-    def next_generation(self, previousState):
-        nextState = []
-        
-        fitness = self.calculate_fitnesses(previousState)
-
-        for pIndex, (fitnesses, stratDistribution, numPlayers) in enumerate(zip(fitness, previousState, self.num_players)):
-            meanFitness = np.mean(fitnesses)
+    def next_generation(self, previous_state, group_selection, rate):
+        next_state = []
+        number_groups=len(previous_state)
+        payoff = []
+        avg_payoffs = []
+        fitness = []
+        for i in range(number_groups):
+            p, avg_p = self.calculate_payoffs(previous_state[i])
+            payoff.append(p)
+            avg_payoffs.append(avg_p)
+            fitness.append(self.calculate_fitnesses(payoff[i], self.selection_strengthI))
             
-            newPlayerState = np.zeros(len(fitnesses))
-            for stratIndex, (stratFitness, stratProportion) in enumerate(zip(fitnesses, stratDistribution)):
-                dStrat = stratProportion * (stratFitness - meanFitness) / self.generation_skip
-                newPlayerState[stratIndex] = stratProportion + dStrat
+        for i in range(number_groups):
+            new_group_state =[]
+            for pIndex, (fitnesses, stratDistribution, numPlayers) in enumerate(zip(fitness[i], previous_state[i], self.num_players)):
+                meanFitness = np.mean(fitnesses)
+            
+                new_player_state = np.zeros(len(fitnesses))
+                for stratIndex, (stratFitness, stratProportion) in enumerate(zip(fitnesses, stratDistribution)):
+                    dStrat = stratProportion * (stratFitness - meanFitness) / self.generation_skip
+                    new_player_state[stratIndex] = stratProportion + dStrat
                 
-            for i, strat in enumerate(newPlayerState):
-                if strat < 0:
-                    newPlayerState[i] = 0
-            if newPlayerState.sum() <= 0:
-                for i in range(len(newPlayerState)):
-                    newPlayerState[i] = 1#Normalization in edge cases (to prevent negative distributions or all 0 distributions
+                for i, strat in enumerate(new_player_state):
+                    if strat < 0:
+                        new_player_state[i] = 0
+                if new_player_state.sum() <= 0:
+                    for i in range(len(new_player_state)):
+                        new_player_state[i] = 1#Normalization in edge cases (to prevent negative distributions or all 0 distributions
                     
-            newPlayerState *= float(numPlayers / newPlayerState.sum())
-            newPlayerState = np.array(self.round_individuals(newPlayerState))
-            nextState.append(newPlayerState)
+                new_player_state *= float(numPlayers / new_player_state.sum())
+                new_player_state = np.array(self.round_individuals(new_player_state))
+                new_group_state.append(new_player_state)
+            next_state.append(new_group_state)
 
-        return nextState, fitness
+        return next_state, fitness
         
     
