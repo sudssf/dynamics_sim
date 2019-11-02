@@ -7,7 +7,9 @@ DyPy provides [Moran](http://en.wikipedia.org/wiki/Moran_process), and
 
 See documentation [here](http://ecbtln.github.io).
 
-# Requirements #
+# Installation and Requirements #
+
+Clone or download the package to your local machine and add it's location to your PYTHONPATH.
 
 DyPy depends on [matplotlib](http://matplotlib.org) for graphing, and [numpy](http://www.numpy.org) and 
 [joblib](https://pythonhosted.org/joblib/). To install these dependencies, make sure you are in the root 
@@ -35,7 +37,3 @@ strategies over time
 
 The ```GameDynamicsWrapper``` and ```VariedGame``` classes take care of simplifying the simulation and
  graphing processes, and automatically parallelize the computations across all available cores.
-
-To see an example, take a look at the [*Cooperate Without Looking*]
-(https://github.com/ecbtln/cwol_sim/blob/master/cwol.py) subclass along with its associated 
-[simulations](https://github.com/ecbtln/cwol_sim/blob/master/test.py).
