@@ -152,7 +152,7 @@ class DynamicsSimulator(object):
         # Setting the initial payoffs to zero
         initial_payoffs = []
         for i in range(self.number_groups):
-            initial_payoffs.append([0*distribution_for_player(n_p, n_s) for n_p, n_s in zip(self.num_players, self.pm.num_strats)])
+            initial_payoffs.append([0*np.random.uniform(0, 1, n_s) for n_p, n_s in zip(self.num_players, self.pm.num_strats)])
 
         # Store the strategy frequencies and payoffs received at each time step
         strategies=[start_state]
