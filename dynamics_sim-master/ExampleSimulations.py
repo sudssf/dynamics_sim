@@ -2,10 +2,10 @@ from wrapper import GameDynamicsWrapper, VariedGame
 
 from dynamics.wright_fisher import WrightFisher
 
-from games.coordination import Coordination
-from games.hawk_dove import HawkDove
-from games.fashion_signaling import FashionSignaling
-from games.cts_disc import CtsDisc
+from games.example_games.coordination import Coordination
+from games.example_games.hawk_dove import HawkDove
+from games.example_games.fashion_signaling import FashionSignaling
+from games.example_games.cts_disc import CtsDisc
 
 import unittest
 

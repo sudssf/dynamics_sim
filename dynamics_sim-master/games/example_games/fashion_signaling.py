@@ -1,5 +1,5 @@
 from games.game import Game
-from games.payoff_matrices.fashion_signaling_matrices import senderPayoffs, receiverPayoffs
+from games.example_games.payoff_matrices.fashion_signaling_matrices import senderPayoffs, receiverPayoffs
 
 class FashionSignaling(Game):
     DEFAULT_PARAMS = dict(lNormalCost=1.1, lHiddenCost=1.1, hNormalCost=1.1, hHiddenCost=1.1, llSender=0.8, lhSender=5,

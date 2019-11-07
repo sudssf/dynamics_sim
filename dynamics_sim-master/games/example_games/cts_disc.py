@@ -1,5 +1,5 @@
 from games.game import Game, SymmetricNPlayerGame
-from games.payoff_matrices.ctsDisc import generatePayoffs
+from games.example_games.payoff_matrices.ctsDisc import generatePayoffs
 
 n = 7  # Number of distinct values
 m = n + 1

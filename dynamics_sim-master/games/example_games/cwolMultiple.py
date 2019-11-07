@@ -1,5 +1,5 @@
 from games.game import game
-from games.payoff_matrics.cwol_multiple import p1Payoffs, p2Payoffs
+from games.example_games.payoff_matrics.cwol_multiple import p1Payoffs, p2Payoffs
 
 class CwolMultiple(game):
     DEFAULT_PARAMS = dict(a=2, b=2, cl=3, ch=5, dl=2.5, dh=5, p=.8, q=.7, r=.3, \

@@ -1,5 +1,5 @@
 from games.game import Game
-from games.payoff_matrices.humbly_signaling_matrices import senderPayoffs, receiverPayoffs
+from games.example_games.payoff_matrices.humbly_signaling_matrices import senderPayoffs, receiverPayoffs
 
 
 class HumblySignaling(Game):

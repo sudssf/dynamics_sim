@@ -1,5 +1,5 @@
 from games.game import Game
-from games.payoff_matrices.hob_matrices import payoffs
+from games.example_games.payoff_matrices.hob_matrices import payoffs
 
 class HoB(Game):
     DEFAULT_PARAMS = dict(p1=1, p2=1, p3=1, p4=1, a=1, b=0, c=0, d=1, player1_prop=0.5)
