@@ -201,8 +201,8 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
                 graphColoredLines(graph_options['colorLineArray'][i], plt, colors)
             if 'textList' in graph_options:
                 plotText(graph_options['textList'], plt, fontsize=fontsize)
-            # Option to save figure as a png file
-            #fig.savefig('%s.png'%labels[0]) 
+            # Option to save figure in any file format. Default is png
+           #fig.savefig('%s.png'%labels[0], bbox_inches='tight') 
 
     plt.show()
     
