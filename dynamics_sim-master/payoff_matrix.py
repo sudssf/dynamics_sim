@@ -61,7 +61,7 @@ class PayoffMatrix(object):
             matrix = matrix[idx]
         return matrix
 
-    def get_expected_payoff(self, player_idx, strategy, current_state, bias_func = lambda f: f):
+    def get_expected_payoff(self, player_idx, strategy, current_state, bias_func = None):
         """
         Get the expected payoff if the player at idx player_idx plays indexed by strategy given the current state. The user can define a function
         that encapsulates the notion of frequency dependent bias i.e. a function of the player_idx frequencies is added to the expected payoff.
@@ -79,12 +79,16 @@ class PayoffMatrix(object):
         """
         current=numpy.asarray(current_state[player_idx])
         current_freq=current/sum(current)
-        squared_sum=sum(current_freq**2)
-
-        # Defining the default function as developed by Nakahashi with a=2. This should be modified according to the nature of the fitness function and the strength of the bias being considered.
+        
+        # Defining the default function as developed by Nakahashi with a=1. This should be modified according to the nature of the fitness function and the strength of the bias being considered.
+        a = 1
+        if a == 1:
+            sum_freq = 1
+        else:
+            sum_freq = sum(current_freq**a)
 
         if bias_func is None:
-            bias_func=lambda freq: ((freq**2/squared_sum))
+            bias_func = lambda freq : ((freq**a/sum_freq))
         self.bias_func=lambda freq:float(bias_func(freq))
 
         biased_payoff=self._iterate_through_players(player_idx, 0, {player_idx: strategy}, 1.0, current_state)*(1-self.bias_strength) + self.bias_func(current_freq[strategy])*self.bias_strength*self.bias_scale
