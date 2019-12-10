@@ -53,6 +53,11 @@ def plot_data_for_players(data, x_range, x_label, num_strats, num_players=None, 
             normalized_data.append(d)
         data = normalized_data
     old_options = GraphOptions.default.copy()
+    
+    # Getting rid of the title if there is only one player type.
+    if len(num_players) == 1:
+        old_options['title'] = lambda player_i: ""
+
     if graph_options is not None:
         old_options.update(graph_options)
     graph_options = old_options
