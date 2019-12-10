@@ -165,7 +165,6 @@ class PayoffMatrix(object):
                 for s_i in range(self.num_strats[p_i]):
                     payoffs.append(numpy.array(self._get_all_payoffs(p_i, s_i, dominated_strategies)))
 
-
                 for s_1 in range(self.num_strats[p_i]):
                     if (p_i, s_1) in dominated_strategies:
                         continue
@@ -180,7 +179,7 @@ class PayoffMatrix(object):
                             continue_iterating = True
                             break
         # (player index, strategy) index set of tuples of dominated strategies
-        self.dominated_strategies = set()
+        self.dominated_strategies = dominated_strategies
 
 
 
