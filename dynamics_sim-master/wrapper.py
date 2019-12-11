@@ -121,9 +121,10 @@ class GameDynamicsWrapper(object):
                     classifications.append(equi)
                     frequencies[equi] += 1
         else:
-            last_generation_state = results_total[-1]
+            last_generation_state = [results_total[-1][-1]]
             classification = game.classify(params, last_generation_state, game.equilibrium_tolerance)
             frequencies[classification] = 1
+            
         
         if graph:
             setupGraph(graph, game, dyn, burn, num_gens, results_total, payoffs_total)
