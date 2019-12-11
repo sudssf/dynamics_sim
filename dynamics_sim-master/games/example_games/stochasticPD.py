@@ -21,17 +21,17 @@ class StochasticPD(SymmetricNPlayerGame):
     
     @classmethod
     def classify(cls, params, state, tolerance):
-        threshold = 1 - tolerance
+        
         R = getattr(params,"R")
         T = getattr(params,"T")
         S = getattr(params,"S")
         P = getattr(params,"P")
         
-        avg_pop_payoff = P*(state[0][0]**2+2*state[0][0]*state[0][2]) + (T+S)*state[0][0]*state[0][1] + R*(state[0][1]**2+state[0][2]**2+2*state[0][2]*state[0][1])
+        tolerance = (R-P)/(T-R)
 
-        if state[0][1] <= (R-P)/(T-R) * state[0][2] :
+        if state[0][1] <= tolerance * state[0][2] :
             return 0#Cooperative Equilibrium
-        elif state[0][1] > (R-P)/(T-R) * state[0][2] :
+        elif state[0][1] > tolerance * state[0][2] :
             return 1#NonCooperative Equilibrium
         else:
             return super(StochasticPD, cls).classify(params, state, tolerance)

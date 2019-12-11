@@ -47,7 +47,7 @@ class DynamicsSimulator(object):
 
         assert pop_size >= 0
         # The total population gets divided equally among the groups only when the population size is larger than
-        # the number of groups. This can probably be made much better.
+        # the number of groups.
         if pop_size > number_groups:
             pop_size = int(pop_size/number_groups)
         
