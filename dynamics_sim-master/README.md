@@ -15,7 +15,8 @@ DyPy depends on [matplotlib](http://matplotlib.org) for graphing, and [numpy](ht
 [joblib](https://pythonhosted.org/joblib/). To install these dependencies, make sure you are in the root 
 directory of the repo and run the following command, which may require sudo.
 
-```pip install -r requirements.txt
+```
+$ pip install -r requirements.txt
 ```
 
 # Usage #
