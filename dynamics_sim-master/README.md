@@ -9,7 +9,7 @@ See documentation [here](http://ecbtln.github.io).
 
 # Installation and Requirements #
 
-Clone or download the package to your local machine and add it's location to your PYTHONPATH.
+Clone or download the package to your local machine. You can run the simulations in the repository rootpath or to run it in Jupyter notebooks for example, add it's location to your PYTHONPATH.
 
 DyPy depends on [matplotlib](http://matplotlib.org) for graphing, and [numpy](http://www.numpy.org) and 
 [joblib](https://pythonhosted.org/joblib/). To install these dependencies, make sure you are in the root 
@@ -17,7 +17,7 @@ directory of the repo and run the following command, which may require sudo.
 
 ```bash
 $ pip install -r requirements.txt
-```
+```t
 
 # Usage #
 

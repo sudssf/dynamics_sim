@@ -207,7 +207,7 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
             if 'textList' in graph_options:
                 plotText(graph_options['textList'], plt, fontsize=fontsize)
             # Option to save figure in any file format. Default is png
-           #fig.savefig('%s.png'%labels[0], bbox_inches='tight') 
+            fig.savefig('%s.png'%labels[0], bbox_inches='tight') 
 
     plt.show()
     
