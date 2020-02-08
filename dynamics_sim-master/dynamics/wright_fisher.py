@@ -7,7 +7,7 @@ class WrightFisher(DynamicsSimulator):
     def __init__(self, mu = None, *args, **kwargs):
         """
         @param mu: mutation rate
-        @type mu: float
+        @type mu: float or a list of n lists, where n is the number of players and len(list_n) = number of player_n strategies. Defaults to zero if not specified.
         """
 
         # TODO don't allow pop_size of 0, wright fisher only works with finite pop size
@@ -16,7 +16,7 @@ class WrightFisher(DynamicsSimulator):
         if mu == None:
             mu = 0.0
         self.mu = mu
-        print(self.mu)
+
     def next_generation(self, previous_state, group_selection, rate):
 
         next_state = []
@@ -38,9 +38,8 @@ class WrightFisher(DynamicsSimulator):
                 mu_matrix.append(self.mu*np.ones(len(payoff[0][i])))
         else:
             mu_matrix = self.mu
-        print(mu_matrix)
-        # Wright-Fisher between groups
 
+        # Wright-Fisher between groups
         if group_selection and np.random.uniform(0,1)<rate:
 
             avg_fitness = []
