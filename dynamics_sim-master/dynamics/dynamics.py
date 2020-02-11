@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import heapq
 import math
 import numpy as np
+import random
 from itertools import chain
 # The precision of the decimal comparison operations this should not need any changing
 DECIMAL_PRECISION = 5
@@ -50,7 +51,7 @@ class DynamicsSimulator(object):
         # the number of groups.
         if pop_size > number_groups:
             pop_size = int(pop_size/number_groups)
-        
+
         if pop_size > 0:
             self.num_players = self.round_individuals([pop_size * x for x in player_frequencies])
             assert sum(self.num_players) == pop_size
@@ -115,15 +116,19 @@ class DynamicsSimulator(object):
 
         return s
 
-    def simulate(self, num_gens=100, start_state=None):
+    def simulate(self, num_gens=100, start_state=None, fixation_probability = False, strategy_indx = 0):
         """
-        Group theory simulation for a given number of generations, optionally starting at a provided state. 
+        Group theory simulation for a given number of generations, optionally starting at a provided state.
         To Do: Better way to deal with population in each group
-        
+
         @param num_gens: the number of iterations of the simulation.
         @type num_gens: int
         @param start_state: An optional list of distributions of strategies for each player.
         @type start_state: list or None
+        @param fixation_probability: Whether the given simulation is to compute the fixation probability for a strategy.
+        @type: bool
+        @param strategy_indx: Strategy whose fixation probability is to be computed.
+        @type: int
         @return: the list of states that the simulation steps through in each generation
         @rtype: list(list(nxm array)) where n:number of player types,m:number of strategies, list over the number of groups.
         """
@@ -131,7 +136,7 @@ class DynamicsSimulator(object):
             group_selection = True
         else:
             group_selection = False
-            
+
         # Set up the start state if not specified and validate it otherwise
         if start_state is None:
             start_state=[]
@@ -144,11 +149,37 @@ class DynamicsSimulator(object):
                 distribution_for_player = lambda n_p, n_s: np.random.dirichlet([1] * n_s) * n_p
             for i in range(self.number_groups):
                 start_state.append([distribution_for_player(n_p, n_s) for n_p, n_s in zip(self.num_players, self.pm.num_strats)])
+
+            # Modify the start state in order to compute the fixation probability
+            if fixation_probability:
+                assert self.number_groups ==1, ('Fixation probability can only be computed for one group')
+                players_to_distribute = start_state[0][0][strategy_indx] - 1
+
+                # There is only one individual playing the strategy whose fixation probability has to be computed.
+                start_state[0][0][strategy_indx] = 1
+
+                # Distribute rest of the players amongst other strategies making sure the total population size is fixed.
+                player_dist = []
+                number_divisions = len(start_state[0][0])-1
+                count = 0
+                for i in range(number_divisions):
+                    if i != number_divisions - 1 :
+                        div = int(players_to_distribute/number_divisions)
+                        count += div
+                        player_dist.append(div)
+                    else:
+                        player_dist.append(players_to_distribute-count)
+                player_dist.insert(strategy_indx,0)
+                for i in range(len(start_state[0][0])):
+                    if i != strategy_indx:
+                        start_state[0][0][i] += player_dist[i]
+                        players_to_distribute -= player_dist
+
         else:
             assert len(start_state)==self.number_groups
             for i in range(self.number_groups):
                 start_state[i] = self.validate_state(start_state[i])
-        
+
         # Setting the initial payoffs to zero
         initial_payoffs = []
         for i in range(self.number_groups):
@@ -157,7 +188,7 @@ class DynamicsSimulator(object):
         # Store the strategy frequencies and payoffs received at each time step
         strategies=[start_state]
         payoffs=[initial_payoffs]
-        
+
         # Actual simulation consisting of two levels of dynamics, one at the level of the group and one in between the groups.
         for i in range(num_gens):
             r,p=self.next_generation(start_state,group_selection,self.rate)
@@ -165,8 +196,8 @@ class DynamicsSimulator(object):
             payoffs.append(np.array([p[j] for j in range(self.number_groups)]))
             start_state=strategies[i+1]
             for j in range(self.number_groups):
-                start_state[j] = self.validate_state(start_state[j]) 
-  
+                start_state[j] = self.validate_state(start_state[j])
+
 
         # Create lists that contain the total normalized frequency and payoffs associated with each player type across groups per time step
         strategies_total=[np.array([np.sum(np.array(strategies[i][j][k]) for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
@@ -205,7 +236,7 @@ class DynamicsSimulator(object):
                 diff -= 1
         assert sum(int_num_senders) == total, "the total number of individuals after rounding must be the same as before rounding"
         return int_num_senders
-    
+
     def calculate_payoffs(self, state):
         """
         """
@@ -213,12 +244,12 @@ class DynamicsSimulator(object):
                        for s_idx in range(num_strats_i)]
                       for p_idx, num_strats_i in enumerate(self.pm.num_strats)]
 
-        
+
         # Average payoff of all members in a group. Lengths could be written better?
         avg_group_payoff = sum([payoff[i][j]*state[i][j] for i in range(len(payoff)) for j in range(len(payoff[0]))])/sum(chain(*state))
-       
+
         return payoff, avg_group_payoff
-    
+
     def calculate_fitnesses(self, payoff, selection_strength):
         """
         Given the payoff matrix for the dynamics simulation, calculate the expected payoff of playing each strategy
@@ -233,6 +264,5 @@ class DynamicsSimulator(object):
         # Calculate fitness for each individual in the population (based on what strategy they are playing)
         fitness = [[self.fitness_func(p,selection_strength) for p in j] for j in payoff]
 
-        
+
         return fitness
-    
