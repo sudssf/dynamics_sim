@@ -160,7 +160,7 @@ class DynamicsSimulator(object):
 
                 # Distribute rest of the players amongst other strategies making sure the total population size is fixed.
                 player_dist = []
-                number_divisions = len(start_state[0][0])-1
+                number_divisions = len(start_state[0][0]) - 1
                 count = 0
                 for i in range(number_divisions):
                     if i != number_divisions - 1 :
@@ -188,7 +188,7 @@ class DynamicsSimulator(object):
         # Store the strategy frequencies and payoffs received at each time step
         strategies=[start_state]
         payoffs=[initial_payoffs]
-
+        
         # Actual simulation consisting of two levels of dynamics, one at the level of the group and one in between the groups.
         for i in range(num_gens):
             r,p=self.next_generation(start_state,group_selection,self.rate)

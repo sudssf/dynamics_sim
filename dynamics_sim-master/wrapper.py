@@ -91,13 +91,14 @@ class GameDynamicsWrapper(object):
         @rtype: numpy.ndarray or dict
         TO DO: Explain what 'burn' does
         """
+
         game = self.game_cls(**self.game_kwargs)
         dyn = self.dynamics_cls(payoff_matrix=game.pm,
                                 player_frequencies=game.player_frequencies,pop_size=pop_size,
                                 **self.dynamics_kwargs)
 
         # Group Selection simulation for a given number of generations.
-        results_total,payoffs_total=dyn.simulate(num_gens,start_state)
+        results_total,payoffs_total=dyn.simulate(num_gens,start_state,fixation_probability,strategy_indx)
 
         # Classify the equilibria and plot the results
         params = Obj(**self.game_kwargs)
@@ -172,7 +173,8 @@ class GameDynamicsWrapper(object):
                                 player_frequencies=game.player_frequencies,pop_size=pop_size,
                                 **self.dynamics_kwargs)
         frequencies = np.zeros(self.game_cls.num_equilibria())
-        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, pop_size=pop_size, strategy_indx = strategy_indx, start_state=start_state, burn=burn, class_end=class_end, fixation_probability = fixation_probability) for iteration in range(num_iterations))
+
+        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, pop_size=pop_size, fixation_probability = fixation_probability, strategy_indx = strategy_indx, start_state= start_state, class_end=class_end) for iteration in range(num_iterations))
 
         equilibria = []
         strategies = [0]*num_iterations
@@ -214,7 +216,7 @@ class GameDynamicsWrapper(object):
 
         for x in equilibria:
             frequencies += x
-
+        
         frequencies /= frequencies.sum()
 
         if return_labeled:
@@ -222,7 +224,7 @@ class GameDynamicsWrapper(object):
         else:
             return frequencies
 
-    def fixation_probability(self, strategy_indx, num_iterations=1000, num_gens=1000, pop_size=100):
+    def fixation_probability(self, strategy_indx, num_iterations=1000, num_gens=1000, pop_size=100, parallelize = True):
         """
         Calculates the fixation probability for a strategy in a symmetric game. It runs the simulate method num_iterations times,
         where the start state consists of one player from the strategy of interest in the population of other player strategies.
@@ -242,7 +244,7 @@ class GameDynamicsWrapper(object):
         assert strategies.ndim == 1, ("Works for only symmetric games.")
 
         # Calculate the fixation probability
-        probability = self.simulate_many(num_iterations = num_iterations, num_gens = num_gens, pop_size = pop_size, fixation_probability = True, strategy_indx = strategy_indx, return_labeled = False)
+        probability = self.simulate_many(num_iterations = num_iterations, num_gens = num_gens, pop_size = pop_size, fixation_probability = True, strategy_indx = strategy_indx, return_labeled = False, parallelize=parallelize)
         return ('fixation probability = %0.2f' %probability[strategy_indx])
 
     @staticmethod
