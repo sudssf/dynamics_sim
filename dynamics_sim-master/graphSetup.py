@@ -1,4 +1,4 @@
-from plot import plot_data_for_players, GraphOptions
+from plot import plot_data_for_players, GraphOptions, plotHistogram
 
 
 def setupGraph(graph, game=None, dyn=None, burn=None, num_gens=None, results=None, payoffs=None):  # TODO allow ordering of various lines
@@ -82,3 +82,28 @@ def setupGraph(graph, game=None, dyn=None, burn=None, num_gens=None, results=Non
         plot_data_for_players(payoffs, range(burn, num_gens), "Generation #", dyn.pm.num_strats,
                               num_players=dyn.num_players,
                               graph_options=dict(), title="Normalized Payoffs")
+
+def setupHistogram(histogram, game = None, dyn = None, num_iterations = None, num_players = None, results = None):
+
+    if histogram is True:
+        histogram = dict()
+    graph_options = histogram
+    if 'options' in graph_options:
+        for key in graph_options['options']:
+            graph_options[key] = True
+        del graph_options['options']
+
+    if game is not None and game.STRATEGY_LABELS is not None:
+        graph_options[GraphOptions.LEGEND_LABELS_KEY] = lambda p, s: game.STRATEGY_LABELS[p][s]
+
+    if game is not None and game.PLAYER_LABELS is not None:
+        graph_options[GraphOptions.TITLE_KEY] = lambda p: game.PLAYER_LABELS[p]
+
+# For each player plotting the histogram of final population of each strategy
+    for playerIdx in range(dyn.pm.num_player_types):
+        strat_iterations = [[] for j in range(dyn.pm.num_strats[playerIdx])]
+        for strat in range(dyn.pm.num_strats[playerIdx]):
+            for iteration in range(num_iterations):
+                strat_iterations[strat].append(results[playerIdx][iteration][strat])
+        xmax = num_players[playerIdx]
+        plotHistogram(strat_iterations, xmax, "Population size", playerIdx, num_strats = dyn.pm.num_strats[playerIdx], graph_options=graph_options)

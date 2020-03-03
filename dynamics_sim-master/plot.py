@@ -53,7 +53,7 @@ def plot_data_for_players(data, x_range, x_label, num_strats, num_players=None, 
             normalized_data.append(d)
         data = normalized_data
     old_options = GraphOptions.default.copy()
-    
+
     # Getting rid of the title if there is only one player type.
     if len(num_players) == 1:
         old_options['title'] = lambda player_i: ""
@@ -77,7 +77,7 @@ def _append_options(options):
         old_options.update(options)
     return old_options
 
-    
+
 def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_options=None, yBot=None):
     """
     support for multiple 2d arrays, each as an entry in the data array
@@ -138,13 +138,13 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
             rawData = copy.deepcopy(data_i)
             fig=plt.figure(i)
             plt.title(title_i(i))
-            
+
             if 'area' in graph_options:
-                stackProportions(data_i)   
-                
+                stackProportions(data_i)
+
             if 'normalize' in graph_options:
                 x_values = normalize(x_values, graph_options['normalize'])
-    
+
             # iterate over all the generations
             num_xs, n_cats = data_i.shape
 
@@ -178,17 +178,17 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
                 if graph_options[GraphOptions.NO_MARKERS_KEY]:
                     marker = ' '
                 else:
-                    marker = markers[cat_i // n_cats]                  
+                    marker = markers[cat_i // n_cats]
 
                 if 'area' in graph_options:
                     if cat_i == 0:
                         plt.fill_between(x_values, data_i[:, cat_i], 0, color=colors[cat_i % n_cats])
                     else:
                         plt.fill_between(x_values, data_i[:, cat_i], data_i[:, cat_i-1], color=colors[cat_i % n_cats])
-                
+
                 plt.plot(x_values, data_i[:, cat_i], c=colors[cat_i % n_cats], lw=2, marker=marker)
-            
-              
+
+
             labels = [category_labels(i, j) for j in range(n_cats)]
 
             legend = plt.legend(labels, loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY], fontsize=fontsize,prop={'size': 10})
@@ -207,10 +207,10 @@ def plot_data(data, x_label, x_values, y_label, title_i, num_categories, graph_o
             if 'textList' in graph_options:
                 plotText(graph_options['textList'], plt, fontsize=fontsize)
             # Option to save figure in any file format. Default is png
-            fig.savefig('%s.png'%labels[0], bbox_inches='tight') 
+            #fig.savefig('%s.png'%labels[0], bbox_inches='tight')
 
     plt.show()
-    
+
 def plot_contour_data_set(data, y_label, y_values, x_label, x_values, z_label, title, num_categories, graph_options=None):
     fontsize = 20
     if 'smallFont' in graph_options or 'smallfont' in graph_options:
@@ -219,33 +219,33 @@ def plot_contour_data_set(data, y_label, y_values, x_label, x_values, z_label, t
         fontsize = 30
 
     # Note it seems as though the x and y values are switched for contour plots
-    
+
     graph_options = _append_options(graph_options)
     category_labels = graph_options[GraphOptions.LEGEND_LABELS_KEY]
     plt.close('all')
-    
+
     colors = ['DarkSlateGray', 'DarkGreen', 'Green', 'ForestGreen',
               'LimeGreen', 'Lime', 'LawnGreen', 'Chartreuse', 'GreenYellow',
               'Yellow', 'Khaki', 'PaleGoldenrod', 'LightGoldenrodYellow',
-              'LightYellow', 'White'] 
-    
+              'LightYellow', 'White']
+
     # iterate over all the generations
     num_xs, num_ys, n_cats = data.shape
 
     assert num_categories == n_cats
-    
+
     # Iterate over all categories
     x_values = numpy.array(x_values)
     y_values = numpy.array(y_values)
-    
+
     levels = [x/len(colors) for x in range(len(colors)+1)]
-    
+
     root = math.ceil(math.sqrt(n_cats))
     if root * (root - 1) >= n_cats:
         rootX = root - 1
     else:
         rootX = root
-    
+
     fig, axs = plt.subplots(rootX, root, figsize = ((rootX*4)+8,rootX*4))
     ax = axs.ravel()
     for cat_i in range(n_cats):
@@ -303,8 +303,26 @@ def plot_3d_data_set(data, x_label, x_values, y_label, y_values, z_label, title,
         zs = data[:, :, cat_i]
         ax.plot_wireframe(xs, ys, zs, color=colors[cat_i % n_cats],linewidth=0.7)
         ax.set_xlabel(x_label)
-        ax.set_ylabel(y_label)    
-    
+        ax.set_ylabel(y_label)
+
     labels = [category_labels(j) for j in range(n_cats)]
     plt.legend(labels, loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY])
     plt.show()
+
+def plotHistogram(data, xmax, x_label, playerIdx = None, num_strats = None, graph_options = None):
+    # Function that plots histograms of final population sizes of player strategies over many iterations of the simulation
+    global colors
+    graph_options = _append_options(graph_options)
+
+    colors = graph_options[GraphOptions.COLORS_KEY]
+    category_labels = graph_options[GraphOptions.LEGEND_LABELS_KEY]
+    fontsize = 20
+
+    plt.figure(figsize=(10,8))
+    for strat in range(num_strats):
+        plt.hist(data[strat], color = colors[strat], label = category_labels(playerIdx ,strat), density = True, stacked = True, alpha = 0.5)
+    plt.xlabel(x_label, fontsize = fontsize)
+    plt.xlim(0,xmax+1)
+    plt.legend(loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY])
+    plt.tick_params(axis='both', which='major', labelsize=fontsize)
+    plt.title("Population distribution for Player %i"%playerIdx, fontsize = fontsize)

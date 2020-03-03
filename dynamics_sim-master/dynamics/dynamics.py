@@ -60,6 +60,7 @@ class DynamicsSimulator(object):
         else:
             self.num_players = player_frequencies
             self.infinite_pop_size = True
+        
         self.pop_size = pop_size
         self.number_groups = int(number_groups)
         self.rate = rate
@@ -188,7 +189,7 @@ class DynamicsSimulator(object):
         # Store the strategy frequencies and payoffs received at each time step
         strategies=[start_state]
         payoffs=[initial_payoffs]
-        
+
         # Actual simulation consisting of two levels of dynamics, one at the level of the group and one in between the groups.
         for i in range(num_gens):
             r,p=self.next_generation(start_state,group_selection,self.rate)

@@ -6,7 +6,7 @@ import types
 import marshal
 from parallel import par_for, delayed, wrapper_simulate, wrapper_vary_for_kwargs
 from util import Obj
-from graphSetup import setupGraph
+from graphSetup import setupGraph, setupHistogram
 
 DEFAULT_ITERATIONS = 100  #: The default number of iterations for which to run a repeated simulation
 DEFAULT_GENERATIONS = 300  #: the default number of generations for which to run a simulation
@@ -141,7 +141,7 @@ class GameDynamicsWrapper(object):
 
     # Add ways to plot the evolution of strategies in a single group?
 
-    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, pop_size=100, start_state=None, graph=False, return_labeled=True, burn=0, parallelize=True, class_end=True, fixation_probability = False, strategy_indx = 0):
+    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, pop_size=100, start_state=None, graph=False, histogram = False, return_labeled=True, burn=0, parallelize=True, class_end=True, fixation_probability = False, strategy_indx = 0):
         """
         A helper method to call the simulate methods num_iterations times simulating num_gens generations each time,
         and then averaging the frequency of the resulting equilibria. Method calls are parallelized and attempt to
@@ -151,6 +151,14 @@ class GameDynamicsWrapper(object):
         @type num_iterations: int
         @param num_gens: the number of generations to run each simulation with
         @type num_gens: int
+        @param pop_size: total population size
+        @type pop_size: int
+        @param start_state: An optional list of distributions of strategies for each player
+        @type start_state: list or None
+        @param graph: the type of graph (false if no graph is wished)
+        @type graph: dict, bool
+        @param histogram: if True plots the histogram of final population sizes over iterations. Both graph and histogram can't be True at the same time.
+        @type histogram: bool
         @param return_labeled: whether the distribution of classified equilibria that are returned should be labelled
             or simply listed with their keys inferred by their order
         @type return_labeled: bool
@@ -186,11 +194,16 @@ class GameDynamicsWrapper(object):
 
         #TODO move these averages or only compile them if appropriate simulation type
         stratAvg = [np.zeros(shape=(num_gens, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
+        # Storing the final strategy populations per iteration
+        strat_final = [np.zeros(shape=(num_iterations, dyn.pm.num_strats[playerIdx])) for playerIdx in range(dyn.pm.num_player_types)]
+
         for iteration in range(num_iterations):
             for player in range(dyn.pm.num_player_types):
                 for gen in range(num_gens - burn):
                     for strat in range(dyn.pm.num_strats[player]):
                         stratAvg[player][gen][strat] += strategies[iteration][player][gen][strat]
+                        if histogram and gen == num_gens - burn - 1:
+                            strat_final[player][iteration][strat] += strategies[iteration][player][gen][strat]
 
         for playerIdx, player in enumerate(stratAvg):
             for genIdx, gen in enumerate(player):
@@ -212,11 +225,14 @@ class GameDynamicsWrapper(object):
                     gen *= dyn.num_players[playerIdx]
 
         if graph:
+            assert histogram == False, ("Can't plot graph and histogram at the same time")
             setupGraph(graph, game, dyn, burn, num_gens, stratAvg, payoffs[0])
+        elif histogram:
+            setupHistogram(histogram, game, dyn, num_iterations, dyn.num_players, strat_final)
 
         for x in equilibria:
             frequencies += x
-        
+
         frequencies /= frequencies.sum()
 
         if return_labeled:
