@@ -323,6 +323,7 @@ def plotHistogram(data, xmax, x_label, playerIdx = None, num_strats = None, grap
         plt.hist(data[strat], color = colors[strat], label = category_labels(playerIdx ,strat), density = True, stacked = True, alpha = 0.5)
     plt.xlabel(x_label, fontsize = fontsize)
     plt.xlim(0,xmax+1)
-    plt.legend(loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY])
+    plt.legend(loc=graph_options[GraphOptions.LEGEND_LOCATION_KEY], fontsize = 18)
     plt.tick_params(axis='both', which='major', labelsize=fontsize)
     plt.title("Population distribution for Player %i"%playerIdx, fontsize = fontsize)
+    #plt.savefig("histogramPD.png",bbox_inches='tight')
