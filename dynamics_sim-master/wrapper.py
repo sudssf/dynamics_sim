@@ -63,7 +63,7 @@ class GameDynamicsWrapper(object):
 
 
 
-    def simulate(self, num_gens=DEFAULT_GENERATIONS, pop_size=100, start_state=None, graph=True, return_labeled=True, burn=0, class_end=False, fixation_probability = False, strategy_indx = 0):
+    def simulate(self, num_gens=DEFAULT_GENERATIONS, pop_size=100, start_state=None, graph=True, return_labeled=True, burn=0, class_end=False, frac_invasions = False, strategy_indx = 0):
         """
         Simulate a game in the presence of group selection for a specific number of generations optionally
         graphing the results
@@ -83,9 +83,9 @@ class GameDynamicsWrapper(object):
         @type return_labeled: bool
         @param class_end: if False the equilibria are classified at all generations and if True only the last generation is classified.
         @type class_end: bool
-        @param fixation_probability: Whether the given simulation is to compute the fixation probability for a strategy.
+        @param frac_invasions: Whether the given simulation is to compute the fraction of invasions for a strategy.
         @type: bool
-        @param strategy_indx: The index of the strategy whose fixation probability is to be computed
+        @param strategy_indx: The index of the strategy whose fraction of invasions is to be computed
         @type strategy_indx: int
         @return: the frequency of time spent in each equilibria, defined by the game
         @rtype: numpy.ndarray or dict
@@ -98,7 +98,7 @@ class GameDynamicsWrapper(object):
                                 **self.dynamics_kwargs)
 
         # Group Selection simulation for a given number of generations.
-        results_total,payoffs_total=dyn.simulate(num_gens,start_state,fixation_probability,strategy_indx)
+        results_total,payoffs_total=dyn.simulate(num_gens,start_state,frac_invasions,strategy_indx)
 
         # Classify the equilibria and plot the results
         params = Obj(**self.game_kwargs)
@@ -129,8 +129,7 @@ class GameDynamicsWrapper(object):
             last_generation_state = [results_total[-1][-1]]
             classification = game.classify(params, last_generation_state, game.equilibrium_tolerance)
             frequencies[classification] = 1
-
-
+        
         if graph:
             setupGraph(graph, game, dyn, burn, num_gens, results_total, payoffs_total)
         else:
@@ -141,7 +140,7 @@ class GameDynamicsWrapper(object):
 
     # Add ways to plot the evolution of strategies in a single group?
 
-    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, pop_size=100, start_state=None, graph=False, histogram = False, return_labeled=True, burn=0, parallelize=True, class_end=True, fixation_probability = False, strategy_indx = 0):
+    def simulate_many(self, num_iterations=DEFAULT_ITERATIONS, num_gens=DEFAULT_GENERATIONS, pop_size=100, start_state=None, graph=False, histogram = False, return_labeled=True, burn=0, parallelize=True, class_end=True, frac_invasions = False, strategy_indx = 0):
         """
         A helper method to call the simulate methods num_iterations times simulating num_gens generations each time,
         and then averaging the frequency of the resulting equilibria. Method calls are parallelized and attempt to
@@ -167,9 +166,9 @@ class GameDynamicsWrapper(object):
         @type parallelize: bool
         @param class_end: if False the equilibria are classified at all generations and if True only the last generation is classified.
         @type class_end: bool
-        @param fixation_probability: Whether the given simulation is to compute the fixation probability for a strategy.
+        @param frac_invasions: Whether the given simulation is to compute the fraction of invasions for a strategy.
         @type: bool
-        @param strategy_indx: The index of the strategy whose fixation probability is to be computed
+        @param strategy_indx: The index of the strategy whose fraction of invasions is to be computed
         @type strategy_indx: int
         @return: the frequency of time spent in each equilibria, defined by the game
         @rtype: np.ndarray or dict
@@ -182,7 +181,7 @@ class GameDynamicsWrapper(object):
                                 **self.dynamics_kwargs)
         frequencies = np.zeros(self.game_cls.num_equilibria())
 
-        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, pop_size=pop_size, fixation_probability = fixation_probability, strategy_indx = strategy_indx, start_state= start_state, class_end=class_end) for iteration in range(num_iterations))
+        output = par_for(parallelize)(delayed(wrapper_simulate)(self, num_gens=num_gens, pop_size=pop_size, frac_invasions = frac_invasions, strategy_indx = strategy_indx, start_state= start_state, class_end=class_end) for iteration in range(num_iterations))
 
         equilibria = []
         strategies = [0]*num_iterations
@@ -240,12 +239,14 @@ class GameDynamicsWrapper(object):
         else:
             return frequencies
 
-    def fixation_probability(self, strategy_indx, num_iterations=1000, num_gens=1000, pop_size=100, parallelize = True):
+    def frac_invasions(self, strategy_indx, num_iterations=1000, num_gens=1000, pop_size=100, parallelize = True):
         """
-        Calculates the fixation probability for a strategy in a symmetric game. It runs the simulate method num_iterations times,
-        where the start state consists of one player from the strategy of interest in the population of other player strategies.
+        Calculates the fraction of runs where a given strategy dominates by the end of the simulation as defined by the equilibrium_tolerance
+        in a symmetric game. It runs the simulate method num_iterations times, where the start state consists of one player from the strategy
+        of interest in the population of other player strategies. This approximates the fixation probability for large enough iterations and
+        number of generations when the equilibrium_tolerance is 0.
 
-        @param strategy_indx: The index of the strategy whose fixation probability is to be computed
+        @param strategy_indx: The index of the strategy whose fraction of invasions is to be computed
         @type strategy_indx: int
         @param num_iterations: Number of iterations to run of the simulation.
         @type: int
@@ -253,15 +254,14 @@ class GameDynamicsWrapper(object):
         @type: int
         @param pop_size: Size of the population.
         @type: int
-        @return: Fixation probability of the required strategy.
+        @return: Fraction of runs where the required strategy dominated the population.
         @type: str
         """
         strategies = np.asarray(self.game_cls.STRATEGY_LABELS)
         assert strategies.ndim == 1, ("Works for only symmetric games.")
 
-        # Calculate the fixation probability
-        probability = self.simulate_many(num_iterations = num_iterations, num_gens = num_gens, pop_size = pop_size, fixation_probability = True, strategy_indx = strategy_indx, return_labeled = False, parallelize=parallelize)
-        return ('fixation probability = %0.2f' %probability[strategy_indx])
+        frac = self.simulate_many(num_iterations = num_iterations, num_gens = num_gens, pop_size = pop_size, frac_invasions = True, strategy_indx = strategy_indx, return_labeled = False, parallelize=parallelize)
+        return ('Fraction of runs where the required strategy dominated the population = %0.2f' %frac[strategy_indx])
 
     @staticmethod
     def _static_convert_equilibria_frequencies(game_cls, frequencies):
