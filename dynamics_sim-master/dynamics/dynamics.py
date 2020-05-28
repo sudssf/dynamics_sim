@@ -60,7 +60,7 @@ class DynamicsSimulator(object):
         else:
             self.num_players = player_frequencies
             self.infinite_pop_size = True
-        
+
         self.pop_size = pop_size
         self.number_groups = int(number_groups)
         self.rate = rate
@@ -201,8 +201,8 @@ class DynamicsSimulator(object):
 
 
         # Create lists that contain the total normalized frequency and payoffs associated with each player type across groups per time step
-        strategies_total=[np.array([np.sum(np.array(strategies[i][j][k]) for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
-        payoffs_total=[np.array([np.sum(np.array(payoffs[i][j][k]) for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
+        strategies_total=[np.array([sum(np.array(strategies[i][j][k]) for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
+        payoffs_total=[np.array([sum(np.array(payoffs[i][j][k]) for j in range(self.number_groups))/self.number_groups for i in range(num_gens)]) for k in range(self.pm.num_player_types)]
 
         return strategies_total, payoffs_total
 
