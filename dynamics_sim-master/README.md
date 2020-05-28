@@ -1,15 +1,15 @@
 A generic, extensible simulation library for evolutionary game theory simulations. 
 DyPy provides [Moran](http://en.wikipedia.org/wiki/Moran_process), and 
 [Wright-Fisher](http://en.wikipedia.org/wiki/Genetic_drift#Wright.E2.80.93Fisher_model) processes,
- as well as [Replicator Dynamics](http://en.wikipedia.org/wiki/Replicator_equation) and makes it simple
-  to execute complex and robust simulations across a range of parameters and visualize the results with
-   beautiful graphs.
+ as well as [Replicator Dynamics](http://en.wikipedia.org/wiki/Replicator_equation). DyPy makes it simple
+to execute complex and robust simulations across a range of parameters and visualize the results with
+different types of graphs.
 
 See original documentation [here](http://ecbtln.github.io).
 
 # Installation and Requirements #
 
-Clone or download the package to your local machine. You can run the simulations in the repository rootpath or to run them globally you can add it's location to your PYTHONPATH.
+Clone or download the package to your local machine. You can run the simulations in the repository rootpath or to run them globally you can add its location to your PYTHONPATH.
 
 DyPy depends on [matplotlib](http://matplotlib.org) for graphing, and [numpy](http://www.numpy.org) and 
 [joblib](https://pythonhosted.org/joblib/). To install these dependencies, make sure you are in the root 
@@ -29,6 +29,6 @@ Once the game class is defined, choose a dynamics process (Wright-Fisher, Moran 
 - Simulate a given number of generations of one simulation, and graph the dynamics of each player's 
 strategies over time
 - Repeat a given simulation multiple times and return the frequency of each resulting equilibria.
-- Vary one or more parameters associated with the dynamics or game constructors and graph the effect of this variation on the resulting equilibria, either in 2D or 3D graphs.
+- Vary one or more parameters associated with the dynamics or game constructors and graph the effect of this variation on the resulting equilibria, either in the form of 2D or 3D graphs.
 
 The ```GameDynamicsWrapper``` and ```VariedGame``` classes take care of simplifying the simulation and graphing processes, and automatically parallelize the computations across all available cores.
