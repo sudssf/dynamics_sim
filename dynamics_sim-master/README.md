@@ -29,7 +29,6 @@ Once the game class is defined, choose a dynamics process (Wright-Fisher, Moran 
 - Simulate a given number of generations of one simulation, and graph the dynamics of each player's 
 strategies over time
 - Repeat a given simulation multiple times and return the frequency of each resulting equilibria.
-- Vary one or more parameters to the dynamics or game constructors and graph the effect of this variation on
- the resulting equilibria, either in 2D or 2D graphs.
+- Vary one or more parameters associated with the dynamics or game constructors and graph the effect of this variation on the resulting equilibria, either in 2D or 3D graphs.
 
 The ```GameDynamicsWrapper``` and ```VariedGame``` classes take care of simplifying the simulation and graphing processes, and automatically parallelize the computations across all available cores.
