@@ -8,6 +8,8 @@ stratOptions1 = ['Punish iff S > ' + str(value) + '/' + str(n+2) for value in ra
 stratOptions2 = ['Punish iff S > ' + str(value) for value in range(0, m+2)]
 
 class CtsDisc(SymmetricNPlayerGame):
+    """ A class that creates a game to study categorical norms. See U{https://www.dropbox.com/s/t358isz782yk4b6/MH_2018_Categorical_Norms.pdf?dl=0}
+    """
     DEFAULT_PARAMS = dict(a=4, b=0, c=2, d=4, errorRange=1/3)
     PLAYER_LABELS = ['']
     #STRATEGY_LABELS = (["Always Punish"] + stratOptions + ["Never Punish"])
