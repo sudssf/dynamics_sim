@@ -2,6 +2,8 @@ from games.game import Game
 from games.example_games.payoff_matrices.fashion_signaling_matrices import senderPayoffs, receiverPayoffs
 
 class FashionSignaling(Game):
+    """ A class used to create a game that is a variation of the buried signaling game. See U{https://www.dropbox.com/s/gd655zcvom7pxzn/Modesty_Combined.pdf?dl=0}
+    """
     DEFAULT_PARAMS = dict(lNormalCost=1.1, lHiddenCost=1.1, hNormalCost=1.1, hHiddenCost=1.1, llSender=0.8, lhSender=5,
                           hlSender=1.2, hhSender=15, llReceiver=-10, hlReceiver=5, lhReceiver=-10, hhReceiver=10,
                           lReceiverCost=3, hReceiverCost=1, lSenderProp=8, hSenderProp=2, lReceiverProp=8,
@@ -20,21 +22,21 @@ class FashionSignaling(Game):
     def __init__(self, lNormalCost, lHiddenCost, hNormalCost, hHiddenCost, llSender, lhSender, hlSender,
                  hhSender, llReceiver, hlReceiver, lhReceiver, hhReceiver, lReceiverCost, hReceiverCost, lSenderProp,
                  hSenderProp, lReceiverProp, hReceiverProp, equilibrium_tolerance):
-        
+
         LSenderProp = lSenderProp / (lSenderProp + hSenderProp)
         HSenderProp = hSenderProp / (lSenderProp + hSenderProp)
-        
+
         LReceiverProp = lReceiverProp / (lReceiverProp + hReceiverProp)
         HReceiverProp = hReceiverProp / (lReceiverProp + hReceiverProp)
-        
+
         payoff_matrix_LS = senderPayoffs(lNormalCost, lHiddenCost, llSender, lhSender, LReceiverProp, HReceiverProp, 'low')
-        
+
         payoff_matrix_HS = senderPayoffs(hNormalCost, hHiddenCost, hlSender, hhSender, LReceiverProp, HReceiverProp, 'high')
-        
+
         payoff_matrix_LR = receiverPayoffs(llReceiver, hlReceiver, lReceiverCost, LSenderProp, HSenderProp, 'low')
-         
+
         payoff_matrix_HR = receiverPayoffs(lhReceiver, hhReceiver, hReceiverCost, LSenderProp, HSenderProp, 'high')
-                                
+
         payoff_matrix = [payoff_matrix_LS, payoff_matrix_HS, payoff_matrix_LR, payoff_matrix_HR]
         player_dist = (LSenderProp/2, HSenderProp/2, LReceiverProp/2, HReceiverProp/2)
         super(FashionSignaling, self).__init__(payoff_matrices=payoff_matrix, player_frequencies=player_dist, equilibrium_tolerance=equilibrium_tolerance)
@@ -53,4 +55,4 @@ class FashionSignaling(Game):
         elif all(x >= threshold for x in [state[0][0], state[1][0], state[2][1], state[3][1]]):
             return 3#Pooling with Acceptance
         else:
-            return super(FashionSignaling, cls).classify(params, state, tolerance)  
+            return super(FashionSignaling, cls).classify(params, state, tolerance)

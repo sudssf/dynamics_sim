@@ -3,6 +3,8 @@ from games.example_games.payoff_matrices.humbly_signaling_matrices import sender
 
 
 class HumblySignaling(Game):
+    """ A class used to create a game that is a variation of the buried signaling game. See U{https://www.dropbox.com/s/gd655zcvom7pxzn/Modesty_Combined.pdf?dl=0}
+    """
     DEFAULT_PARAMS = dict(lReveal=.1, mReveal=.2, hReveal=.8, lCost=5, mCost=1,
                           hCost=1, llSender=1, lhSender=2, mlSender=3, mhSender=4, hlSender=1,
                           hhSender=10, llReceiver=-10, mlReceiver=4, hlReceiver=5, lhReceiver=-20,
@@ -20,24 +22,24 @@ class HumblySignaling(Game):
                  mhSender, hlSender, hhSender, llReceiver, mlReceiver, hlReceiver, lhReceiver,
                  mhReceiver, hhReceiver, lSenderProp, mSenderProp, high_sender_proportion, lReceiverProp,
                  hReceiverProp, equilibrium_tolerance):
-        
+
         hSenderProp = high_sender_proportion  #Renaming for cleanliness
-        
+
         LSenderProp = lSenderProp / (lSenderProp + mSenderProp + hSenderProp)
         MSenderProp = mSenderProp / (lSenderProp + mSenderProp + hSenderProp)
         HSenderProp = hSenderProp / (lSenderProp + mSenderProp + hSenderProp)
-        
+
         LReceiverProp = lReceiverProp / (lReceiverProp + hReceiverProp)
         HReceiverProp = hReceiverProp / (lReceiverProp + hReceiverProp)# Normalize the proportions
-        
+
         payoff_matrix_LS = senderPayoffs(lCost, llSender, lhSender, LReceiverProp, HReceiverProp, lReveal, 'l')
 
         payoff_matrix_MS = senderPayoffs(mCost, mlSender, mhSender, LReceiverProp, HReceiverProp, mReveal, 'm')
-        
+
         payoff_matrix_HS = senderPayoffs(hCost, hlSender, hhSender, LReceiverProp, HReceiverProp, hReveal, 'h')
-        
+
         payoff_matrix_LR = receiverPayoffs(lReveal, mReveal, hReveal, llReceiver, mlReceiver, hlReceiver, lSenderProp, mSenderProp, hSenderProp, 'l')
-        
+
         payoff_matrix_HR = receiverPayoffs(lReveal, mReveal, hReveal, lhReceiver, mhReceiver, hhReceiver, lSenderProp, mSenderProp, hSenderProp, 'h')
 
         payoff_matrix = [payoff_matrix_LS, payoff_matrix_MS, payoff_matrix_HS, payoff_matrix_LR, payoff_matrix_HR]
@@ -62,4 +64,4 @@ class HumblySignaling(Game):
         elif state[4][0] > threshold:
             return 5#High accepts all
         else:
-            return super(HumblySignaling, cls).classify(params, state, tolerance)  
+            return super(HumblySignaling, cls).classify(params, state, tolerance)
