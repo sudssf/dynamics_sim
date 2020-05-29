@@ -2,6 +2,9 @@ from games.game import Game
 
 
 class CWOL(Game):
+    """ A class used to define the 'Cooperate without looking' game. See: Cooperate without looking
+Hoffman et. al, Proceedings of the National Academy of Sciences Feb 2015, 112 (6) 1727-1732; DOI: 10.1073/pnas.1417904112
+    """
     DEFAULT_PARAMS = dict(a=1, b=1, c_low=4, c_high=12, d=-10, w=0.895, p=0.51, player1_prop=0.5,bias_strength=0)
     PLAYER_LABELS = ('Player 1', 'Player 2')
     STRATEGY_LABELS = (('CWOL', 'CWL', 'C if Low', 'All D'),
@@ -26,7 +29,7 @@ class CWOL(Game):
     @classmethod
     def classify(cls, params, state, tolerance):
         threshold = 1 - tolerance
-        
+
         if state[0][0] >= threshold:
             return 0#Cooperate with out looking
         elif state[0][1] >= threshold:

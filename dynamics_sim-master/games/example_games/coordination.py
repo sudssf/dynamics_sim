@@ -1,6 +1,8 @@
 from games.game import Game
 
 class Coordination(Game):
+    """ A class used to represent the coordination game. See U{https://en.wikipedia.org/wiki/Coordination_game}
+    """
     DEFAULT_PARAMS = dict(a=1, b=5)
     PLAYER_LABELS = ('Player 1', 'Player 2')
     STRATEGY_LABELS = (('A1', 'B1'),
@@ -10,7 +12,7 @@ class Coordination(Game):
     def __init__(self, a, b, equilibrium_tolerance=0.2):
         payoff_matrix_1 = ((a, 0),
                            (0, b))
-                                
+
         payoff_matrix_2 = ((a, 0),
                            (0, b))
 
