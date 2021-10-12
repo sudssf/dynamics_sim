@@ -1,6 +1,10 @@
+import sys, os
+src_path = os.path.dirname(os.path.abspath(__file__))
+parent = os.path.dirname(os.path.abspath(os.path.join(src_path, os.pardir)))
+print('Adding {} to path'.format(parent))
+sys.path.insert(0, os.path.abspath(parent))   
 from games.game import Game
 import numpy as np
-
 class CostlySignaling(Game):
     """ Class that defines a version of the costly signaling game. See : Hoffman, Moshe and Erez Yoeli, Costly Signaling," University Lecture 2015.
     """
